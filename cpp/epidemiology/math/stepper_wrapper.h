@@ -88,7 +88,16 @@ public:
             m_stepper.do_step(sys, dxdt, t, dt / Steps);
             //m_stepper.do_step(sys, dxdt, t, dt);
         }*/
-        m_stepper.do_step(sys, dxdt, t, dt);
+        m_stepper.do_step(
+            // reorder arguments of the DerivFunction f for the stepper
+            [&](const Eigen::VectorXd& x, Eigen::VectorXd& dxdt, double t){
+                dxdt.resizeLike(x); // do_step calls sys with a vector of size 0 for some reason
+                f(x, t, dxdt);
+            },
+            dxdt,
+            t,
+            dt
+        );
         ytp1 = dxdt;
         t += dt;
         return true; // no step size adaption
@@ -112,16 +121,19 @@ class ExplicitStepperWrapper : public epi::IntegratorCore {
 public:
     bool step(const epi::DerivFunction& f, Eigen::Ref<Eigen::VectorXd const> yt, double& t, double& dt,
               Eigen::Ref<Eigen::VectorXd> ytp1) const override {
-        // reorder arguments of the DerivFunction f for the stepper
-        std::function<void(const Eigen::VectorXd& x, Eigen::VectorXd& dxdt, double t)> sys =
-            [&](const Eigen::VectorXd& x, Eigen::VectorXd& dxdt, double t){
-                dxdt.resizeLike(x); // do_step calls sys with a vector of size 0 for some reason
-                f(x, t, dxdt);
-            };
         // copy y(t) to dxdt, since we use the scheme do_step(sys, inout, t, dt) with sys=f, inout=y(t) for
         // in-place computation - also, this form is shared by several (all?) steppers in boost
         Eigen::VectorXd dxdt = yt.eval();
-        m_stepper.do_step(sys, dxdt, t, dt);
+        m_stepper.do_step(
+            // reorder arguments of the DerivFunction f for the stepper
+            [&](const Eigen::VectorXd& x, Eigen::VectorXd& dxdt, double t){
+                dxdt.resizeLike(x); // do_step calls sys with a vector of size 0 for some reason
+                f(x, t, dxdt);
+            },
+            dxdt,
+            t,
+            dt
+        );
         ytp1 = dxdt;
         t += dt;
         return true; // no step size adaption
@@ -155,18 +167,21 @@ public:
     {}
     bool step(const epi::DerivFunction& f, Eigen::Ref<Eigen::VectorXd const> yt, double& t, double& dt,
               Eigen::Ref<Eigen::VectorXd> ytp1) const override {
-        // reorder arguments of the DerivFunction f for the stepper
-        std::function<void(const Eigen::VectorXd& x, Eigen::VectorXd& dxdt, double t)> sys =
-            [&](const Eigen::VectorXd& x, Eigen::VectorXd& dxdt, double t){
-                dxdt.resizeLike(x); // do_step calls sys with a vector of size 0 for some reason
-                f(x, t, dxdt);
-            };
         // copy y(t) to dxdt, since we use the scheme try_step(sys, inout, t, dt) with sys=f, inout=y(t) for
         // in-place computation. This is similiar to do_step, but it updates t and dt
         Eigen::VectorXd dxdt = yt.eval();
         const double t_old = t; // t is updated by try_step on a successfull step
         while (t == t_old && dt > m_dt_min) {
-            m_stepper.try_step(sys, dxdt, t, dt);
+            m_stepper.try_step(
+                // reorder arguments of the DerivFunction f for the stepper
+                [&](const Eigen::VectorXd& x, Eigen::VectorXd& dxdt, double t){
+                    dxdt.resizeLike(x); // do_step calls sys with a vector of size 0 for some reason
+                    f(x, t, dxdt);
+                },
+                dxdt,
+                t,
+                dt
+            );
         }
         ytp1 = dxdt;
         return dt > m_dt_min;
