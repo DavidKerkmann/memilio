@@ -20,6 +20,7 @@ Eigen::VectorXd abs(Eigen::VectorXd x) {
 #include <boost/numeric/odeint/stepper/adams_bashforth_moulton.hpp>
 #include <boost/numeric/odeint/stepper/runge_kutta_fehlberg78.hpp>
 #include <boost/numeric/odeint/stepper/runge_kutta_cash_karp54.hpp>
+#include <boost/numeric/odeint/stepper/runge_kutta_dopri5.hpp>
 #include <boost/numeric/odeint/stepper/bulirsch_stoer.hpp>
 //#include <boost/numeric/odeint/stepper/base/explicit_stepper_base.hpp>
 //#include <boost/boost/numeric/odeint/algebra/algebra_dispatcher.hpp>

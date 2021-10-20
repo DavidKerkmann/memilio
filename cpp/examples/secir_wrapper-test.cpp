@@ -121,7 +121,7 @@ int main()
     const double relative_tolerance = 1e-6;
 
     //std::shared_ptr<epi::IntegratorCore> I = std::make_shared<epi::ExplicitStepperWrapper<boost::numeric::odeint::runge_kutta_fehlberg78>>();
-    std::shared_ptr<epi::IntegratorCore> I = std::make_shared<epi::ControlledStepperWrapper<boost::numeric::odeint::runge_kutta_cash_karp54>>();
+    std::shared_ptr<epi::IntegratorCore> I = std::make_shared<epi::ControlledStepperWrapper<boost::numeric::odeint::runge_kutta_dopri5>>();
     //std::shared_ptr<epi::IntegratorCore> I = std::make_shared<epi::ABMStepperWrapper<4, boost::numeric::odeint::adams_bashforth_moulton>>();
     epi::TimeSeries<double> secir = simulate(t0, tmax, dt, model, I);
 
