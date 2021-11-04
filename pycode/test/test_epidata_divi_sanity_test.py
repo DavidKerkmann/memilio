@@ -18,6 +18,7 @@
 # limitations under the License.
 #############################################################################
 import unittest
+from epidemiology.epidata import getDIVIData as gD
 
 # The following lines are commented to remember a solution to write an output without using the function print()
 # This is important, because the usage of print would alter the test results
@@ -26,6 +27,12 @@ import unittest
 
 class Test_SanityChecks(unittest.TestCase):
     def test_header_names(self):
+        today = date.today()
+        last_number = 6072
+        [_, df, _] = gD.download_data_for_one_day(last_number, today)
+        row_1=df.iloc[0]
+        
+
         actual_name = "date"              
         given_name = "date"          
         self.assertEqual(actual_name, given_name)
