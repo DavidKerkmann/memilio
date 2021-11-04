@@ -1,7 +1,7 @@
 #############################################################################
 # Copyright (C) 2020-2021 German Aerospace Center (DLR-SC)
 #
-# Authors:
+# Authors: Patrick Lenz, Sascha Korf 
 #
 # Contact: Martin J. Kuehn <Martin.Kuehn@DLR.de>
 #
@@ -26,6 +26,7 @@ import unittest
 
 class Test_SanityChecks(unittest.TestCase):
     def test_header_names(self):
+        a=2
 
 if __name__ == '__main__':
     unittest.main()
