@@ -42,8 +42,17 @@ class Test_SanityChecks(unittest.TestCase):
         actual_strings_list = df.columns.tolist()
 
         #Compare
+        matchcounter = 0
+        for name in actual_strings_list:
+               if(name in test_strings):
+                matchcounter = matchcounter+1
+
+        message = "Not the same headers anymore!"
+        self.assertEqual(matchcounter,len(test_strings), message)
         
-        
+      
+
+
 
 
 
