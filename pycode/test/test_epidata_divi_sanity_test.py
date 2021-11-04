@@ -29,16 +29,25 @@ from datetime import timedelta, date
 class Test_SanityChecks(unittest.TestCase):
     def test_header_names(self):
 
+        #These strings need to be in the header 
         test_strings = {"date","bundesland","gemeindeschluessel","anzahl_standorte","anzahl_meldebereiche","faelle_covid_aktuell","faelle_covid_aktuell_invasiv_beatmet","betten_frei",
         "betten_belegt","betten_belegt_nur_erwachsen","betten_frei_nur_erwachsen"}
 
-
+        #get current Header 
         today = date.today()
         last_number = 6072
         [_, df, _] = gD.download_data_for_one_day(last_number, today)
-        row_1=df.iloc
-
         
+        #get actual headers
+        actual_strings_list = df.columns.tolist()
+
+        #Compare
+        
+        
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
