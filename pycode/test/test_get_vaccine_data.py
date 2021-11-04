@@ -25,7 +25,7 @@ import os
 import pandas as pd
 import numpy as np
 
-from epidemiology.epidata import getVaccineData
+from epidemiology.epidata import getVaccinationData
 from epidemiology.epidata import getPopulationData
 
 
@@ -84,12 +84,12 @@ class TestGetVaccineData(fake_filesystem_unittest.TestCase):
     def setUp(self):
         self.setUpPyfakefs()
 
-    @patch('epidemiology.epidata.getVaccineData.download_vaccine_data', return_value=(test_vaccine_df, 'test_vaccine'))
-    @patch('epidemiology.epidata.getVaccineData.getPopulationData.get_age_population_data', return_value=test_pop_df)
+    @patch('epidemiology.epidata.getVaccinationData.download_vaccine_data', return_value=(test_vaccine_df, 'test_vaccine'))
+    @patch('epidemiology.epidata.getVaccinationData.getPopulationData.get_age_population_data', return_value=test_pop_df)
     def test_get_vaccine_data(self, mock_vaccine, mock_pop):
 
         [read_data, file_format, out_folder, no_raw] = [False, 'json', self.path, False]
-        getVaccineData.get_vaccine_data(read_data, file_format, out_folder, no_raw)
+        getVaccinationData.get_vaccine_data(read_data, file_format, out_folder, no_raw)
 
         directory = os.path.join(out_folder, 'Germany/')
 

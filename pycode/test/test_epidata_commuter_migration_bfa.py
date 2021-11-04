@@ -22,7 +22,7 @@ from pyfakefs import fake_filesystem_unittest
 from unittest.mock import patch
 import pandas as pd
 import os
-from epidemiology.epidata import commuter_migration_bfa as cm
+from epidemiology.epidata import getCommuterMobility as cm
 from epidemiology.epidata import getDataIntoPandasDataFrame as gD
 
 

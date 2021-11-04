@@ -29,7 +29,7 @@ import pandas as pd
 from epidemiology.epidata import getDataIntoPandasDataFrame as gd
 from epidemiology.epidata import defaultDict as dd
 
-from epidemiology.epidata import getVaccineData
+from epidemiology.epidata import getVaccinationData
 from epidemiology.epidata import getPopulationData
 from epidemiology.epidata import getRKIData
 from epidemiology.epidata import getDIVIData
