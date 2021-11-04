@@ -42,21 +42,26 @@ class Test_SanityChecks(unittest.TestCase):
         actual_strings_list = df.columns.tolist()
 
         #Compare
-        matchcounter = 0
         for name in actual_strings_list:
-               if(name in test_strings):
-                matchcounter = matchcounter+1
-
-        message = "Not the same headers anymore!"
-        self.assertEqual(matchcounter,len(test_strings), message)
+            if(name not in test_strings):
+                self.assertFalse("Not the same headers anymore!")
+    
+    def test_number_of_data(self):
         
-      
+        #These strings need to be in the header 
+        test_strings = {"date","bundesland","gemeindeschluessel","anzahl_standorte","anzahl_meldebereiche","faelle_covid_aktuell","faelle_covid_aktuell_invasiv_beatmet","betten_frei",
+        "betten_belegt","betten_belegt_nur_erwachsen","betten_frei_nur_erwachsen"}
 
+        #get current Header 
+        today = date.today()
+        last_number = 6072
+        [_, df, _] = gD.download_data_for_one_day(last_number, today)
+        
+        #get actual headers
+        actual_strings_list = df.columns.tolist()
 
-
-
-
-
+        self.assertEqual(len(test_strings),len(actual_strings_list),"Number of data categories changed.")
+        
 
 if __name__ == '__main__':
     unittest.main()
