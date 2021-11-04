@@ -19,6 +19,7 @@
 #############################################################################
 import unittest
 from epidemiology.epidata import getDIVIData as gD
+from datetime import timedelta, date
 
 # The following lines are commented to remember a solution to write an output without using the function print()
 # This is important, because the usage of print would alter the test results
@@ -27,15 +28,17 @@ from epidemiology.epidata import getDIVIData as gD
 
 class Test_SanityChecks(unittest.TestCase):
     def test_header_names(self):
+
+        test_strings = {"date","bundesland","gemeindeschluessel","anzahl_standorte","anzahl_meldebereiche","faelle_covid_aktuell","faelle_covid_aktuell_invasiv_beatmet","betten_frei",
+        "betten_belegt","betten_belegt_nur_erwachsen","betten_frei_nur_erwachsen"}
+
+
         today = date.today()
         last_number = 6072
         [_, df, _] = gD.download_data_for_one_day(last_number, today)
-        row_1=df.iloc[0]
-        
+        row_1=df.iloc
 
-        actual_name = "date"              
-        given_name = "date"          
-        self.assertEqual(actual_name, given_name)
+        
 
 if __name__ == '__main__':
     unittest.main()
