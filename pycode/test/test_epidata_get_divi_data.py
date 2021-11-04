@@ -45,37 +45,37 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
 
     # strings for read, download and update data
     test_string1 = ("""{"bundesland":1,"gemeindeschluessel":1001,"anzahl_meldebereiche":2,"faelle_covid_aktuell":0,\
-"faelle_covid_aktuell_beatmet":0,"anzahl_standorte":2,"betten_frei":48,"betten_belegt":34,\
-"daten_stand":"2020-07-07 12:15:00"},\
-{"bundesland":2,"gemeindeschluessel":2000,"anzahl_meldebereiche":28,"faelle_covid_aktuell":7,\
-"faelle_covid_aktuell_beatmet":6,"anzahl_standorte":24,"betten_frei":396,"betten_belegt":574,\
-"daten_stand":"2020-07-07 12:15:00"},\
-{"bundesland":3,"gemeindeschluessel":3101,"anzahl_meldebereiche":5,"faelle_covid_aktuell":1,\
-"faelle_covid_aktuell_beatmet":1,"anzahl_standorte":5,"betten_frei":60,"betten_belegt":96,\
-"daten_stand":"2020-07-07 12:15:00"},\
-{"bundesland":3,"gemeindeschluessel":3103,"anzahl_meldebereiche":1,"faelle_covid_aktuell":4,\
-"faelle_covid_aktuell_beatmet":1,"anzahl_standorte":1,"betten_frei":11,"betten_belegt":23,\
-"daten_stand":"2020-07-07 12:15:00"}""")
+    "faelle_covid_aktuell_beatmet":0,"anzahl_standorte":2,"betten_frei":48,"betten_belegt":34,\
+    "daten_stand":"2020-07-07 12:15:00"},\
+    {"bundesland":2,"gemeindeschluessel":2000,"anzahl_meldebereiche":28,"faelle_covid_aktuell":7,\
+    "faelle_covid_aktuell_beatmet":6,"anzahl_standorte":24,"betten_frei":396,"betten_belegt":574,\
+    "daten_stand":"2020-07-07 12:15:00"},\
+    {"bundesland":3,"gemeindeschluessel":3101,"anzahl_meldebereiche":5,"faelle_covid_aktuell":1,\
+    "faelle_covid_aktuell_beatmet":1,"anzahl_standorte":5,"betten_frei":60,"betten_belegt":96,\
+    "daten_stand":"2020-07-07 12:15:00"},\
+    {"bundesland":3,"gemeindeschluessel":3103,"anzahl_meldebereiche":1,"faelle_covid_aktuell":4,\
+    "faelle_covid_aktuell_beatmet":1,"anzahl_standorte":1,"betten_frei":11,"betten_belegt":23,\
+    "daten_stand":"2020-07-07 12:15:00"}""")
 
     test_string2 = ("""{"bundesland":2,"gemeindeschluessel":2000,"anzahl_meldebereiche":28,"faelle_covid_aktuell":7,\
-"faelle_covid_aktuell_beatmet":6,"anzahl_standorte":24,"betten_frei":397,"betten_belegt":579,\
-"daten_stand":"2020-07-08 12:15:00"},\
-{"bundesland":3,"gemeindeschluessel":3101,"anzahl_meldebereiche":5,"faelle_covid_aktuell":1,\
-"faelle_covid_aktuell_beatmet":1,"anzahl_standorte":5,"betten_frei":65,"betten_belegt":91,\
-"daten_stand":"2020-07-08 12:15:00"}""")
+    "faelle_covid_aktuell_beatmet":6,"anzahl_standorte":24,"betten_frei":397,"betten_belegt":579,\
+    "daten_stand":"2020-07-08 12:15:00"},\
+    {"bundesland":3,"gemeindeschluessel":3101,"anzahl_meldebereiche":5,"faelle_covid_aktuell":1,\
+    "faelle_covid_aktuell_beatmet":1,"anzahl_standorte":5,"betten_frei":65,"betten_belegt":91,\
+    "daten_stand":"2020-07-08 12:15:00"}""")
 
     test_string3 = ("""{"bundesland":1,"gemeindeschluessel":1001,"anzahl_meldebereiche":2,"faelle_covid_aktuell":0,\
-"faelle_covid_aktuell_beatmet":0,"anzahl_standorte":2,"betten_frei":48,"betten_belegt":34,\
-"daten_stand":"2020-07-06 12:15:00"}""")
+    "faelle_covid_aktuell_beatmet":0,"anzahl_standorte":2,"betten_frei":48,"betten_belegt":34,\
+    "daten_stand":"2020-07-06 12:15:00"}""")
 
-# The following are the same as test_string3 but with changed dates.
+    # The following are the same as test_string3 but with changed dates.
     test_string4 = ("""{"bundesland":1,"gemeindeschluessel":1001,"anzahl_meldebereiche":2,"faelle_covid_aktuell":0,\
-"faelle_covid_aktuell_beatmet":0,"anzahl_standorte":2,"betten_frei":48,"betten_belegt":34,\
-"daten_stand":"2020-04-27 09:15:00"}""")
+    "faelle_covid_aktuell_beatmet":0,"anzahl_standorte":2,"betten_frei":48,"betten_belegt":34,\
+    "daten_stand":"2020-04-27 09:15:00"}""")
 
     test_string5 = ("""{"bundesland":1,"gemeindeschluessel":1001,"anzahl_meldebereiche":2,"faelle_covid_aktuell":0,\
-"faelle_covid_aktuell_beatmet":0,"anzahl_standorte":2,"betten_frei":48,"betten_belegt":34,\
-"daten_stand":"2020-04-28 09:15:00"}""")
+    "faelle_covid_aktuell_beatmet":0,"anzahl_standorte":2,"betten_frei":48,"betten_belegt":34,\
+    "daten_stand":"2020-04-28 09:15:00"}""")
 
     test_string_read_fulldata = "[" + test_string1 + "," + test_string2 + "]"
     test_string_read_fulldata_update = "[" + test_string3 + \
@@ -91,66 +91,66 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
 
     # result string for counties
     test_stringr1_county = ("""\
-{"County":"SK Flensburg","ID_County":1001,"ICU":0,"ICU_ventilated":0,"Date":1594124100000},\
-{"County":"SK Hamburg","ID_County":2000,"ICU":7,"ICU_ventilated":6,"Date":1594124100000},\
-{"County":"SK Braunschweig","ID_County":3101,"ICU":1,"ICU_ventilated":1,"Date":1594124100000},\
-{"County":"SK Wolfsburg","ID_County":3103,"ICU":4,"ICU_ventilated":1,"Date":1594124100000}""")
+    {"County":"SK Flensburg","ID_County":1001,"ICU":0,"ICU_ventilated":0,"Date":1594124100000},\
+    {"County":"SK Hamburg","ID_County":2000,"ICU":7,"ICU_ventilated":6,"Date":1594124100000},\
+    {"County":"SK Braunschweig","ID_County":3101,"ICU":1,"ICU_ventilated":1,"Date":1594124100000},\
+    {"County":"SK Wolfsburg","ID_County":3103,"ICU":4,"ICU_ventilated":1,"Date":1594124100000}""")
 
     test_stringr2_county = ("""\
-{"County":"SK Hamburg","ID_County":2000,"ICU":7,"ICU_ventilated":6,"Date":1594210500000},\
-{"County":"SK Braunschweig","ID_County":3101,"ICU":1,"ICU_ventilated":1,"Date":1594210500000}""")
+    {"County":"SK Hamburg","ID_County":2000,"ICU":7,"ICU_ventilated":6,"Date":1594210500000},\
+    {"County":"SK Braunschweig","ID_County":3101,"ICU":1,"ICU_ventilated":1,"Date":1594210500000}""")
 
     test_stringr3_county = ("""\
-{"County":"SK Flensburg","ID_County":1001,"ICU":0,"ICU_ventilated":0,"Date":1594037700000}""")
+    {"County":"SK Flensburg","ID_County":1001,"ICU":0,"ICU_ventilated":0,"Date":1594037700000}""")
 
     test_stringr4_county = ("""\
-{"County":"SK Flensburg","ID_County":1001,"ICU":0,"ICU_ventilated":0,"Date":1587978900000}""")
+    {"County":"SK Flensburg","ID_County":1001,"ICU":0,"ICU_ventilated":0,"Date":1587978900000}""")
 
     test_stringr5_county = ("""\
-{"County":"SK Flensburg","ID_County":1001,"ICU":0,"ICU_ventilated":0,"Date":1588065300000}""")
+    {"County":"SK Flensburg","ID_County":1001,"ICU":0,"ICU_ventilated":0,"Date":1588065300000}""")
 
     # result string for states
     test_stringr1_state = ("""\
-{"Date":1594124100000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"},\
-{"Date":1594124100000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
-{"Date":1594124100000,"ICU":5,"ICU_ventilated":2,"ID_State":3,"State":"Niedersachsen"}""")
+    {"Date":1594124100000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"},\
+    {"Date":1594124100000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
+    {"Date":1594124100000,"ICU":5,"ICU_ventilated":2,"ID_State":3,"State":"Niedersachsen"}""")
 
     test_stringr2_state = ("""\
-{"Date":1594124100000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"},\
-{"Date":1594124100000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
-{"Date":1594210500000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
-{"Date":1594124100000,"ICU":5,"ICU_ventilated":2,"ID_State":3,"State":"Niedersachsen"},\
-{"Date":1594210500000,"ICU":1,"ICU_ventilated":1,"ID_State":3,"State":"Niedersachsen"}""")
+    {"Date":1594124100000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"},\
+    {"Date":1594124100000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
+    {"Date":1594210500000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
+    {"Date":1594124100000,"ICU":5,"ICU_ventilated":2,"ID_State":3,"State":"Niedersachsen"},\
+    {"Date":1594210500000,"ICU":1,"ICU_ventilated":1,"ID_State":3,"State":"Niedersachsen"}""")
 
     test_stringr3_state = ("""\
-{"Date":1594037700000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"},\
-{"Date":1594124100000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"},\
-{"Date":1594124100000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
-{"Date":1594210500000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
-{"Date":1594124100000,"ICU":5,"ICU_ventilated":2,"ID_State":3,"State":"Niedersachsen"},\
-{"Date":1594210500000,"ICU":1,"ICU_ventilated":1,"ID_State":3,"State":"Niedersachsen"}""")
+    {"Date":1594037700000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"},\
+    {"Date":1594124100000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"},\
+    {"Date":1594124100000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
+    {"Date":1594210500000,"ICU":7,"ICU_ventilated":6,"ID_State":2,"State":"Hamburg"},\
+    {"Date":1594124100000,"ICU":5,"ICU_ventilated":2,"ID_State":3,"State":"Niedersachsen"},\
+    {"Date":1594210500000,"ICU":1,"ICU_ventilated":1,"ID_State":3,"State":"Niedersachsen"}""")
 
     test_stringr4_state = ("""\
-{"Date":1587978900000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"}""")
+    {"Date":1587978900000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"}""")
 
     test_stringr5_state = ("""\
-{"Date":1588065300000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"}""")
+    {"Date":1588065300000,"ICU":0,"ICU_ventilated":0,"ID_State":1,"State":"Schleswig-Holstein"}""")
 
     # result string for germany
     test_stringr1_country = ("""\
-{"Date":1594124100000,"ICU":12,"ICU_ventilated":8}""")
+    {"Date":1594124100000,"ICU":12,"ICU_ventilated":8}""")
 
     test_stringr2_country = ("""\
-{"Date":1594210500000,"ICU":8,"ICU_ventilated":7}""")
+    {"Date":1594210500000,"ICU":8,"ICU_ventilated":7}""")
 
     test_stringr3_country = ("""\
-{"Date":1594037700000,"ICU":0,"ICU_ventilated":0}""")
+    {"Date":1594037700000,"ICU":0,"ICU_ventilated":0}""")
 
     test_stringr4_country = ("""\
-{"Date":1587978900000,"ICU":0,"ICU_ventilated":0}""")
+    {"Date":1587978900000,"ICU":0,"ICU_ventilated":0}""")
 
     test_stringr5_country = ("""\
-{"Date":1588065300000,"ICU":0,"ICU_ventilated":0}""")
+    {"Date":1588065300000,"ICU":0,"ICU_ventilated":0}""")
 
     # data for test dataframe to test the function adjust_data
     d24 = {'bundesland': [1, 2], 'kreis': [1001, 2000], 'ICU': [0, 7]}

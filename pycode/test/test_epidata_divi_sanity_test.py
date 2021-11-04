@@ -1,7 +1,7 @@
 #############################################################################
 # Copyright (C) 2020-2021 German Aerospace Center (DLR-SC)
 #
-# Authors:
+# Authors: Patrick Lenz, Sascha Korf 
 #
 # Contact: Martin J. Kuehn <Martin.Kuehn@DLR.de>
 #
