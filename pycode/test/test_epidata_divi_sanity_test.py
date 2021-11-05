@@ -18,7 +18,7 @@
 # limitations under the License.
 #############################################################################
 import unittest
-from epidemiology.epidata import getDIVIData as gDivi
+from epidemiology.epidata import getDIVIData as gdd
 from datetime import timedelta, date
 
 # The following lines are commented to remember a solution to write an output without using the function print()
@@ -29,15 +29,17 @@ from datetime import timedelta, date
 class Test_SanityChecks(unittest.TestCase):
     def test_header_names(self):
 
-        #These strings need to be in the header 
-        test_strings = {"date","bundesland","gemeindeschluessel","faelle_covid_aktuell","faelle_covid_aktuell_invasiv_beatmet"}
+        # These strings need to be in the header 
+        test_strings = {
+            "date", "bundesland", "gemeindeschluessel", "faelle_covid_aktuell",
+            "faelle_covid_aktuell_invasiv_beatmet"}
 
-        #get current Header 
+        # get current Header 
         today = date.today()
         last_number = 6072
-        [_, df, _] = gDivi.download_data_for_one_day(last_number, today)
+        [_, df, _] = gdd.download_data_for_one_day(last_number, today)
         
-        #get actual headers
+        # get actual headers
         actual_strings_list = df.columns.tolist()
 
         #Compare
@@ -47,37 +49,47 @@ class Test_SanityChecks(unittest.TestCase):
     
     def test_number_of_data(self):
         
-        #These strings are the given data categories 
-        test_strings = {"date","bundesland","gemeindeschluessel","anzahl_standorte","anzahl_meldebereiche","faelle_covid_aktuell","faelle_covid_aktuell_invasiv_beatmet","betten_frei",
-        "betten_belegt","betten_belegt_nur_erwachsen","betten_frei_nur_erwachsen"}
+        # These strings are the given data categories 
+        test_strings = {
+            "date", "bundesland", "gemeindeschluessel", "anzahl_standorte",
+            "anzahl_meldebereiche", "faelle_covid_aktuell",
+            "faelle_covid_aktuell_invasiv_beatmet", "betten_frei",
+            "betten_belegt", "betten_belegt_nur_erwachsen",
+            "betten_frei_nur_erwachsen"}
 
-        #get current Header 
+        # get current Header 
         today = date.today()
         last_number = 6072
-        [_, df, _] = gDivi.download_data_for_one_day(last_number, today)
+        [_, df, _] = gdd.download_data_for_one_day(last_number, today)
         
-        #get actual headers
+        # get actual headers
         actual_strings_list = df.columns.tolist()
 
-        self.assertEqual(len(test_strings),len(actual_strings_list),"Number of data categories changed.")
+        # compare
+        self.assertEqual(
+            len(test_strings),
+            len(actual_strings_list),
+            "Number of data categories changed.")
 
     def test_number_of_rows(self):
 
-        #get actual length of dataframe
-        today = date.today() - timedelta(days=6)
+        # get actual length of dataframe
+        today = date.today()
         last_number = 6072
-        [_, df, _] = gDivi.download_data_for_one_day(last_number, today)
+        [_, df, _] = gdd.download_data_for_one_day(last_number, today)
         actual_data_length = len(df.index)
 
-        last_length = 222145                            #date = 2021-4-11
-        average_plus = 396.3                            #calculated from last 7 known
+        # calculate length of df
+        last_length = 222145                # date = 2021-4-11
+        average_plus = 396.3                # calculated from last 7 known
         days_difference = (today - date(2021, 11, 4)).days
         cal_exp_lgth = last_length + average_plus*(days_difference)
-        variety = 0.005
+        variety = 0.0005
 
-        #compare
-        self.assertAlmostEqual(variety + actual_data_length/cal_exp_lgth, 1.00, 1,
-                                "There's a huge difference in lenght of the given data")
+        # compare
+        self.assertAlmostEqual(
+            variety + actual_data_length / cal_exp_lgth, 1.00, 2,
+            "There's a huge difference in lenght of the given data")
 
 
 if __name__ == '__main__':
