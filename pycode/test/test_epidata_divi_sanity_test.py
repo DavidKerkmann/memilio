@@ -18,7 +18,7 @@
 # limitations under the License.
 #############################################################################
 import unittest
-from epidemiology.epidata import getDIVIData as gD
+from epidemiology.epidata import getDIVIData as gDivi
 from datetime import timedelta, date
 
 # The following lines are commented to remember a solution to write an output without using the function print()
@@ -30,38 +30,55 @@ class Test_SanityChecks(unittest.TestCase):
     def test_header_names(self):
 
         #These strings need to be in the header 
-        test_strings = {"date","bundesland","gemeindeschluessel","anzahl_standorte","anzahl_meldebereiche","faelle_covid_aktuell","faelle_covid_aktuell_invasiv_beatmet","betten_frei",
-        "betten_belegt","betten_belegt_nur_erwachsen","betten_frei_nur_erwachsen"}
+        test_strings = {"date","bundesland","gemeindeschluessel","faelle_covid_aktuell","faelle_covid_aktuell_invasiv_beatmet"}
 
         #get current Header 
         today = date.today()
         last_number = 6072
-        [_, df, _] = gD.download_data_for_one_day(last_number, today)
+        [_, df, _] = gDivi.download_data_for_one_day(last_number, today)
         
         #get actual headers
         actual_strings_list = df.columns.tolist()
 
         #Compare
-        for name in actual_strings_list:
-            if(name not in test_strings):
+        for name in test_strings:
+            if(name not in actual_strings_list):
                 self.assertFalse("Not the same headers anymore!")
     
     def test_number_of_data(self):
         
-        #These strings need to be in the header 
+        #These strings are the given data categories 
         test_strings = {"date","bundesland","gemeindeschluessel","anzahl_standorte","anzahl_meldebereiche","faelle_covid_aktuell","faelle_covid_aktuell_invasiv_beatmet","betten_frei",
         "betten_belegt","betten_belegt_nur_erwachsen","betten_frei_nur_erwachsen"}
 
         #get current Header 
         today = date.today()
         last_number = 6072
-        [_, df, _] = gD.download_data_for_one_day(last_number, today)
+        [_, df, _] = gDivi.download_data_for_one_day(last_number, today)
         
         #get actual headers
         actual_strings_list = df.columns.tolist()
 
         self.assertEqual(len(test_strings),len(actual_strings_list),"Number of data categories changed.")
-        
+
+    def test_number_of_rows(self):
+
+        #get actual length of dataframe
+        today = date.today() - timedelta(days=6)
+        last_number = 6072
+        [_, df, _] = gDivi.download_data_for_one_day(last_number, today)
+        actual_data_length = len(df.index)
+
+        last_length = 222145                            #date = 2021-4-11
+        average_plus = 396.3                            #calculated from last 7 known
+        days_difference = (today - date(2021, 11, 4)).days
+        cal_exp_lgth = last_length + average_plus*(days_difference)
+        variety = 0.005
+
+        #compare
+        self.assertAlmostEqual(variety + actual_data_length/cal_exp_lgth, 1.00, 1,
+                                "There's a huge difference in lenght of the given data")
+
 
 if __name__ == '__main__':
     unittest.main()
