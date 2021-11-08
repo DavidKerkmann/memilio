@@ -397,7 +397,8 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         self.assertTrue(mock_ccu.mock_calls[-2:] == expected_calls)
 
         # test case where given number has a difference larger than 2 to call_number, namely 4
-        call_string_correct = "date(" + test_date.strftime("%Y-%-m-%-d") + "): " #+ str(test_call_number) + "," + "\n"
+        call_string_correct = "date(" + test_date.strftime(
+            "%Y-%m-%d") + "): " + str(test_call_number) + "," + "\n"
 
         [call_number, df, call_string] = gdd.download_data_for_one_day(
             self.test_url_ending_else[test_date][1] - 4, test_date)
