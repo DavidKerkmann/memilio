@@ -25,10 +25,10 @@ from datetime import timedelta, date
 # This is important, because the usage of print would alter the test results
 # import sys
 # sys.stdout.write(str()) 
+# Data comes from  "https://www.divi.de/divi-intensivregister-tagesreport-archiv-csv"
 
 class Test_SanityChecks(unittest.TestCase):
     def test_header_names(self):
-
         # These strings need to be in the header 
         test_strings = {
             "date", "bundesland", "gemeindeschluessel", "faelle_covid_aktuell",
@@ -47,8 +47,7 @@ class Test_SanityChecks(unittest.TestCase):
             if(name not in actual_strings_list):
                 self.assertFalse("Not the same headers anymore!")
     
-    def test_number_of_data(self):
-        
+    def test_number_of_data(self):   
         # These strings are the given data categories 
         test_strings = {
             "date", "bundesland", "gemeindeschluessel", "anzahl_standorte",
@@ -72,7 +71,6 @@ class Test_SanityChecks(unittest.TestCase):
             "Number of data categories changed.")
 
     def test_number_of_rows(self):
-
         # get actual length of dataframe
         today = date.today()
         last_number = 6072
@@ -90,6 +88,15 @@ class Test_SanityChecks(unittest.TestCase):
         self.assertAlmostEqual(
             variety + actual_data_length / cal_exp_lgth, 1.00, 2,
             "There's a huge difference in lenght of the given data")
+
+    def easy_number_of_rows_test(self):
+        # If we just want to check if it's one day data or all the data we can just check the ballpark of the number of rows.
+        
+        today = date.today()
+        last_number = 6072
+        [_, df, _] = gdd.download_data_for_one_day(last_number, today)
+        actual_data_length = len(df.index)
+
 
 
 if __name__ == '__main__':
