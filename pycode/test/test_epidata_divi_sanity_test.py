@@ -28,19 +28,21 @@ from datetime import timedelta, date
 # Data comes from  "https://www.divi.de/divi-intensivregister-tagesreport-archiv-csv"
 
 class Test_SanityChecks(unittest.TestCase):
+    
+    def setUp(self):
+        # get current Header 
+        self.today = date.today() - timedelta(1)
+        self.last_number = 6072
+        [_, self.df, _] = gdd.download_data_for_one_day(self.last_number, self.today)
+
     def test_header_names(self):
         # These strings need to be in the header 
         test_strings = {
             "date", "bundesland", "gemeindeschluessel", "faelle_covid_aktuell",
             "faelle_covid_aktuell_invasiv_beatmet"}
 
-        # get current Header 
-        today = date.today() - timedelta(1)
-        last_number = 6072
-        [_, df, _] = gdd.download_data_for_one_day(last_number, today)
-        
         # get actual headers
-        actual_strings_list = df.columns.tolist()
+        actual_strings_list = self.df.columns.tolist()
 
         #Compare
         for name in test_strings:
@@ -56,13 +58,9 @@ class Test_SanityChecks(unittest.TestCase):
             "betten_belegt", "betten_belegt_nur_erwachsen",
             "betten_frei_nur_erwachsen"}
 
-        # get current Header 
-        today = date.today() - timedelta(1)
-        last_number = 6072
-        [_, df, _] = gdd.download_data_for_one_day(last_number, today)
-        
+    
         # get actual headers
-        actual_strings_list = df.columns.tolist()
+        actual_strings_list = self.df.columns.tolist()
 
         # compare
         self.assertEqual(
@@ -71,33 +69,23 @@ class Test_SanityChecks(unittest.TestCase):
             "Number of data categories changed.")
 
     def test_number_of_rows(self):
-        # get actual length of dataframe
-        today = date.today() - timedelta(1)
-        last_number = 6072
-        [_, df, _] = gdd.download_data_for_one_day(last_number, today)
-        actual_data_length = len(df.index)
+        actual_data_length = len(self.df.index)
 
         # calculate length of df
         last_length = 222145                # date = 2021-4-11
         average_plus = 396.3                # calculated from last 7 known
-        days_difference = (today - date(2021, 11, 4)).days
+        days_difference = (self.today - date(2021, 11, 4)).days
         cal_exp_lgth = last_length + average_plus*(days_difference)
         variety = 0.05
 
         # compare
         self.assertAlmostEqual(
-            variety + actual_data_length / cal_exp_lgth, 1.00, 1,
-            "There's a huge difference in lenght of the given data")
+            actual_data_length / cal_exp_lgth, 1.00, None,
+            "There's a huge difference in lenght of the given data",variety)
 
-    def easy_number_of_rows_test(self):
-        # If we just want to check if it's one day data or all the data we can just check the ballpark of the number of rows.
-        
-        today = date.today()
-        last_number = 6072
-        [_, df, _] = gdd.download_data_for_one_day(last_number, today)
-        actual_data_length = len(df.index)
-
-
+    def test_number_of_rows_rudimentary(self):
+        actual_data_length = len(self.df.index)
+        self.assertGreaterEqual(actual_data_length, 222145, "The probably data changed in size, e.g. data for just one day instead of every day in one file.")
 
 if __name__ == '__main__':
     unittest.main()
