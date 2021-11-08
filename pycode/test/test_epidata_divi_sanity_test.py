@@ -35,7 +35,7 @@ class Test_SanityChecks(unittest.TestCase):
             "faelle_covid_aktuell_invasiv_beatmet"}
 
         # get current Header 
-        today = date.today()
+        today = date.today() - timedelta(1)
         last_number = 6072
         [_, df, _] = gdd.download_data_for_one_day(last_number, today)
         
@@ -58,7 +58,7 @@ class Test_SanityChecks(unittest.TestCase):
             "betten_frei_nur_erwachsen"}
 
         # get current Header 
-        today = date.today()
+        today = date.today() - timedelta(1)
         last_number = 6072
         [_, df, _] = gdd.download_data_for_one_day(last_number, today)
         
@@ -74,7 +74,7 @@ class Test_SanityChecks(unittest.TestCase):
     def test_number_of_rows(self):
 
         # get actual length of dataframe
-        today = date.today()
+        today = date.today() - timedelta(1)
         last_number = 6072
         [_, df, _] = gdd.download_data_for_one_day(last_number, today)
         actual_data_length = len(df.index)
@@ -84,11 +84,11 @@ class Test_SanityChecks(unittest.TestCase):
         average_plus = 396.3                # calculated from last 7 known
         days_difference = (today - date(2021, 11, 4)).days
         cal_exp_lgth = last_length + average_plus*(days_difference)
-        variety = 0.0005
+        variety = 0.05
 
         # compare
         self.assertAlmostEqual(
-            variety + actual_data_length / cal_exp_lgth, 1.00, 2,
+            variety + actual_data_length / cal_exp_lgth, 1.00, 1,
             "There's a huge difference in lenght of the given data")
 
 
