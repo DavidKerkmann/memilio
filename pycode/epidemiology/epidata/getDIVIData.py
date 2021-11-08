@@ -396,7 +396,7 @@ def download_data_for_one_day(last_number, download_date):
                 # for delta 1 and 2 the number is not saved in dict,
                 # because it does not take so long to get those numbers
                 if sign == 0 and delta != 1 and delta != 2 and not start_date_differs:
-                    call_string = "date(" + download_date.strftime("%Y, %m, %d") + "): " + str(call_number) + "," \
+                    call_string = "date(" + download_date.strftime("%Y-%m-%d") + "): " + str(call_number) + "," \
                                   + "\n"
 
                 df = call_call_url(url_prefix, call_number)
@@ -406,7 +406,7 @@ def download_data_for_one_day(last_number, download_date):
 
         # case with same call_number, which is very unlikely
         call_number = last_number
-        call_string = "date(" + download_date.strftime("%Y, %m, %d") + "): " + str(call_number) + "," + "\n"
+        call_string = "date(" + download_date.strftime("%Y-%m-%d") + "): " + str(call_number) + "," + "\n"
         df = call_call_url(url_prefix, call_number)
 
     return [call_number, df, call_string]
