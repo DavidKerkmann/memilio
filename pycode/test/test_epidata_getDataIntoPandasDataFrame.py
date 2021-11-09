@@ -156,8 +156,6 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
     def test_cli_correct_default(self):
         
         out_path_default = dd.defaultDict['out_folder']
-        out_path_default = os.path.join(out_path_default, 'pydata')
-
         arg_dict = gd.cli("population")
         [read_data, file_format, out_folder, no_raw] = [arg_dict["read_data"], arg_dict["file_format"],
                                                         arg_dict["out_folder"], arg_dict["no_raw"]]

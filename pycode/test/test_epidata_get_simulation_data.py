@@ -27,7 +27,7 @@ import pandas as pd
 
 from epidemiology.epidata import getDIVIData as gdd
 from epidemiology.epidata import getRKIData as grki
-from epidemiology.epidata import getVaccineData as gvd
+from epidemiology.epidata import getVaccinationData as gvd
 from epidemiology.epidata import getPopulationData as gpd
 from epidemiology.epidata import getSimulationData as gsd
 

@@ -20,6 +20,7 @@
 # import unittest
 from pyfakefs import fake_filesystem_unittest
 from unittest.mock import patch
+import unittest
 import pandas as pd
 import os
 from epidemiology.epidata import getCommuterMobility as cm
@@ -277,15 +278,16 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
                       'counties': counties,
                       'path': self.path}
         (countykey_list, countypop_list, govkey_list, countykey2numlist, govkey2numlist, gov_county_table,
-         countykey2govkey,
-         countykey2localnumlist, state_gov_table, mat_commuter_migration) = cm.get_data(setup_dict)
+         countykey2govkey, countykey2localnumlist, state_gov_table, mat_commuter_migration) = cm.get_commuter_data(setup_dict)
         # just do some tests on randomly chosen migrations
 
         # check migration from Leverkusen (averaged from NRW, 05) to Hildburghausen
         city_from = countykey2numlist['05316']
         city_to = countykey2numlist['16069']
         self.assertEqual(countypop_list[city_from], 163729)
-        self.assertEqual(mat_commuter_migration[city_from][city_to], 34 * countypop_list[city_from] / (498686 + 163729))
+        self.assertEqual(
+            mat_commuter_migration[city_from][city_to],
+            34 * countypop_list[city_from] / (498686 + 163729))
 
         # check migration from Duisburg to Oberspreewald-Lausitz
         city_from = countykey2numlist['05112']
