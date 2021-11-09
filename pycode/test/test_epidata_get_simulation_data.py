@@ -48,8 +48,8 @@ class TestGetSimulationData(fake_filesystem_unittest.TestCase):
     @patch('epidemiology.epidata.getRKIData.get_rki_data')
     @patch('epidemiology.epidata.getPopulationData.get_population_data')
     @patch('epidemiology.epidata.getPopulationData.get_age_population_data')
-    @patch('epidemiology.epidata.getVaccineData.get_vaccine_data')
-    def test_get_call_sub_functions(self, mock_vaccine, mock_agep, mock_popul, mock_rki, mock_divi):
+    @patch('epidemiology.epidata.getVaccinationData.get_vaccination_data')
+    def test_get_call_sub_functions(self, mock_vaccination, mock_agep, mock_popul, mock_rki, mock_divi):
 
         [read_data, file_format, out_folder, no_raw, end_date, fill_dates, make_plot, moving_average, split_berlin,
          start_date, update_data] = [False, "json", self.path, False, dd.defaultDict['end_date'],
@@ -69,8 +69,8 @@ class TestGetSimulationData(fake_filesystem_unittest.TestCase):
         arg_dict_divi = {**arg_dict_all, "end_date": dd.defaultDict['end_date'],
                          "start_date": dd.defaultDict['start_date'], "update_data": dd.defaultDict['update_data']}
 
-        mock_vaccine.assert_called()
-        mock_vaccine.assert_called_with(**arg_dict_all)
+        mock_vaccination.assert_called()
+        mock_vaccination.assert_called_with(**arg_dict_all)
 
         mock_agep.assert_called()
         mock_agep.assert_called_with(**arg_dict_all)

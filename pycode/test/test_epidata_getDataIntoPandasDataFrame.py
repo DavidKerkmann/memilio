@@ -476,10 +476,10 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
     @patch('epidemiology.epidata.getRKIData.get_rki_data')
     @patch('epidemiology.epidata.getPopulationData.get_population_data')
     @patch('epidemiology.epidata.getPopulationData.get_age_population_data')
-    @patch('epidemiology.epidata.getVaccineData.get_vaccine_data')
+    @patch('epidemiology.epidata.getVaccinationData.get_vaccination_data')
     @patch('epidemiology.epidata.getRKIDatawithEstimations.get_rki_data_with_estimations')
     @patch('epidemiology.epidata.getJHData.get_jh_data')
-    def test_call_functions(self, mock_jh, mock_rkiwe, mock_vaccine, mock_agep, mock_popul, mock_rki,
+    def test_call_functions(self, mock_jh, mock_rkiwe, mock_vaccination, mock_agep, mock_popul, mock_rki,
                             mock_divi):
 
         arg_dict_all = {"read_data": dd.defaultDict['read_data'], "file_format": dd.defaultDict['file_format'],
@@ -495,9 +495,9 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         arg_dict_divi = {**arg_dict_all, "end_date": dd.defaultDict['end_date'],
                          "start_date": dd.defaultDict['start_date'], "update_data": dd.defaultDict['update_data']}
 
-        getVaccineData.main()
-        mock_vaccine.assert_called()
-        mock_vaccine.assert_called_with(**arg_dict_all)
+        getVaccinationData.main()
+        mock_vaccination.assert_called()
+        mock_vaccination.assert_called_with(**arg_dict_all)
 
         getPopulationData.main()
         mock_agep.assert_called()

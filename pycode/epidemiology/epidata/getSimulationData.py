@@ -25,7 +25,7 @@
 The functions which are called are:
 - getRKIData.get_rki_data
 - getPopulationData.get_population_data
-- getVacccineData.get_vaccine_data
+- getVacccinationData.get_vaccination_data
 - getDIVIData.get_divi_data
 """
 
