@@ -54,7 +54,9 @@ def check_for_completeness(df):
    """
 
     if not df.empty:
-        return geoger.check_for_all_counties(df["IdLandkreis"].unique(), merge_berlin=False)
+        return geoger.check_for_all_counties(
+            df["IdLandkreis"].unique(),
+            merge_berlin=False, merge_eisenach=False)
 
     # if it is empty
     return False

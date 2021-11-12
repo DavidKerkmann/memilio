@@ -19,7 +19,10 @@
 #############################################################################
 import unittest
 from epidemiology.epidata import getDIVIData as gdd
+from epidemiology.epidata import getCommuterMobility as cm
+from epidemiology.epidata import defaultDict as dd
 from datetime import timedelta, date
+from epidemiology.epidata import getPopulationData as gpd
 
 # The following lines are commented to remember a solution to write an output without using the function print()
 # This is important, because the usage of print would alter the test results
@@ -27,7 +30,10 @@ from datetime import timedelta, date
 # sys.stdout.write(str()) 
 # Data comes from  "https://www.divi.de/divi-intensivregister-tagesreport-archiv-csv"
 
-class Test_SanityChecks(unittest.TestCase):
+class Test_Divi_SanityChecks(unittest.TestCase):
+
+    # all test in this class fail if the test runs before 12:15. 
+    # if you want to test before 12:15 you need to add "- timedelta(1)" after date.today() in setUp(self)
     
     def setUp(self):
         # get current Header 
@@ -85,7 +91,46 @@ class Test_SanityChecks(unittest.TestCase):
 
     def test_number_of_rows_rudimentary(self):
         actual_data_length = len(self.df.index)
-        self.assertGreaterEqual(actual_data_length, 222145, "The probably data changed in size, e.g. data for just one day instead of every day in one file.")
+        self.assertGreaterEqual(
+            actual_data_length, 222145,
+            "The probably data changed in size, e.g. data for just one day instead of every day in one file.")
+    
+class Test_Commuter_SanityChecks(unittest.TestCase):
+    
+    def setUp(self):
+        # is there any way to do this faster?
+        self.df_commuter_migration = cm.get_commuter_data(
+            setup_dict='', read_data=dd.defaultDict['read_data'],
+            file_format=dd.defaultDict['file_format'],
+            out_folder=dd.defaultDict['out_folder'],
+            make_plot=dd.defaultDict['make_plot'],
+            no_raw=dd.defaultDict['no_raw'])
 
+    def test_data_size(self):
+        self.assertEqual(len(self.df_commuter_migration.index),
+                         len(self.df_commuter_migration.columns))
+        assert len(self.df_commuter_migration.index) > 0
+        assert len(self.df_commuter_migration.index) < 500
+
+    # check if diagonal elements =0 ?
+'''class Test_PopulationData_SanityChecks(unittest.TestCase):
+    
+    def setUp(self):
+        self.df = gpd.get_population_data()
+
+    def test_header_names(self):
+        test_strings = {
+            "FID", "LAN_ew_RS", "LAN_ew_AGS", "LAN_ew_SDV_RS", "LAN_ew_GEN",
+            "LAN_ew_BEZ", "LAN_ew_IBZ", "LAN_ew_FK_S3", "LAN_ew_NUTS",
+            "LAN_ew_WSK", "LAN_ew_EWZ", "LAN_ew_KFL", "SHAPE_Length",
+            "SHAPE_Area", "LAN_ew_SN-G", "LAN_ew_SN-R", "LAN_ew_SN-L",
+            "LAN_ew_SN-K", "LAN_ew_SN-V1", "LAN_ew_SN-V2", "LAN_ew_BEM"}
+        actual_strings_list = self.df.columns.tolist()
+
+        # compare
+        for name in test_strings:
+            if(name not in actual_strings_list):
+                self.assertFalse("Not the same headers anymore!")
+'''
 if __name__ == '__main__':
     unittest.main()

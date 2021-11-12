@@ -235,7 +235,7 @@ def load_age_population_data(out_folder):
                 print('Trying to download data from the internet')
                 path_counties = 'https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/04-kreise.xlsx;?__blob=publicationFile'
                 counties = gd.loadExcel(os.path.join(path_counties,'kreise_deu.xlsx'), apiUrl =  '', extension = '',
-                                param_dict = {"sheet_name": 1, "header": 3})
+                                param_dict = {"sheet_name": 1, "header": 3, "engine": 'openpyxlx'})
                 gd.write_dataframe(counties, directory, filename_counties, "json")
             except ValueError:
                 exit_string = "Error: The counties file does not exist."

@@ -24,7 +24,9 @@ import unittest
 import pandas as pd
 import os
 from epidemiology.epidata import getCommuterMobility as cm
+from epidemiology.epidata import geoModificationGermany as geoger
 from epidemiology.epidata import getDataIntoPandasDataFrame as gD
+from epidemiology.epidata import defaultDict as dd
 
 
 class TestCommuterMigration(fake_filesystem_unittest.TestCase):
@@ -32,6 +34,11 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
 
     def setUp(self):
         self.setUpPyfakefs()
+        self.setup_dict = {
+            'num_counties': 2, 'abs_tol': 100, 'rel_tol': 0.01,
+            'num_govregions': 2, 'counties': 'empty', 'path': self.path}
+        (self.countykey_list, self.countypop_list, self.govkey_list, self.countykey2numlist, govkey2numlist, gov_county_table,
+         countykey2govkey, countykey2localnumlist, state_gov_table, self.mat_commuter_migration) = cm.get_commuter_data(self.setup_dict)
 
     def write_kreise_deu_data(self, out_folder):
         # sheet 0 is unused in commuter_migration_bfa, but other one has to have index 1
@@ -230,22 +237,9 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
         self.write_kreise_deu_data(self.path)
         self.write_commuter_all_federal_states(self.path)
         self.assertEqual(len(os.listdir(self.path)), 17)
-        counties = gD.loadExcel(
-            'kreise_deu', apiUrl=self.path, extension='.xlsx',
-            param_dict={"sheet_name": 1})
-        setup_dict = {'num_counties': 2,
-                      'abs_tol': 100,
-                      'rel_tol': 0.01,
-                      'num_govregions': 2,
-                      'counties': counties,
-                      'path': self.path}
-        cm.map_keys_to_numlists(setup_dict)
-        mock_print.assert_any_call('Error. Number of government regions wrong. Having', 17, 'instead of', 2)
-        mock_print.assert_any_call("Error. Number of counties wrong.")
-        mock_print.assert_any_call('Error. Number of governing regions wrong.')
 
         mock_print.call_args_list = []
-        cm.assign_geographical_entities(setup_dict)
+        cm.assign_geographical_entities(self.countykey_list, self.govkey_list)
         mock_print.assert_any_call('Error. Number of government regions wrong.')
 
         mock_print.call_args_list = []
@@ -255,9 +249,9 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
                                    'accordingly.')
 
         mock_print.call_args_list = []
-        setup_dict['num_counties'] = 21
-        setup_dict['num_govregions'] = 17
-        cm.get_matrix_commuter_migration_patterns(setup_dict)
+        self.setup_dict['num_counties'] = 21
+        self.setup_dict['num_govregions'] = 17
+        cm.get_matrix_commuter_migration_patterns(self.setup_dict)
         mock_print.assert_any_call('Error in calculations for county ', 'Duisburg, Stadt', '\nAccumulated values:',
                                    333.0, ', correct sum:', 305.0)
 
@@ -268,46 +262,36 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
         self.write_kreise_deu_data(self.path)
         self.write_commuter_all_federal_states(self.path)
         self.assertEqual(len(os.listdir(self.path)), 17)
-        counties = gD.loadExcel(
-            'kreise_deu', apiUrl=self.path, extension='.xlsx',
-            param_dict={"sheet_name": 1})
-        setup_dict = {'num_counties': 21,
-                      'abs_tol': 100,
-                      'rel_tol': 0.01,
-                      'num_govregions': 17,
-                      'counties': counties,
-                      'path': self.path}
-        (countykey_list, countypop_list, govkey_list, countykey2numlist, govkey2numlist, gov_county_table,
-         countykey2govkey, countykey2localnumlist, state_gov_table, mat_commuter_migration) = cm.get_commuter_data(setup_dict)
+        
         # just do some tests on randomly chosen migrations
 
         # check migration from Leverkusen (averaged from NRW, 05) to Hildburghausen
-        city_from = countykey2numlist['05316']
-        city_to = countykey2numlist['16069']
-        self.assertEqual(countypop_list[city_from], 163729)
+        city_from = self.countykey2numlist['05316']
+        city_to = self.countykey2numlist['16069']
+        self.assertEqual(self.countypop_list[city_from], 163729)
         self.assertEqual(
-            mat_commuter_migration[city_from][city_to],
-            34 * countypop_list[city_from] / (498686 + 163729))
+            self.mat_commuter_migration[city_from][city_to],
+            34 * self.countypop_list[city_from] / (498686 + 163729))
 
         # check migration from Duisburg to Oberspreewald-Lausitz
-        city_from = countykey2numlist['05112']
-        city_to = countykey2numlist['12066']
-        self.assertEqual(mat_commuter_migration[city_from][city_to], 10)
+        city_from = self.countykey2numlist['05112']
+        city_to = self.countykey2numlist['12066']
+        self.assertEqual(self.mat_commuter_migration[city_from][city_to], 10)
 
         # check migration from Lahn-Dill-Kreis to Hamburg
-        city_from = countykey2numlist['06532']
-        city_to = countykey2numlist['02000']
-        self.assertEqual(mat_commuter_migration[city_from][city_to], 92)
+        city_from = self.countykey2numlist['06532']
+        city_to = self.countykey2numlist['02000']
+        self.assertEqual(self.mat_commuter_migration[city_from][city_to], 92)
 
         # check migration from Landsberg am Lech (averaged from 091) to Hersfeld-Rotenburg
-        city_from = countykey2numlist['09181']
-        city_to = countykey2numlist['06632']
-        self.assertEqual(mat_commuter_migration[city_from][city_to], 47)
+        city_from = self.countykey2numlist['09181']
+        city_to = self.countykey2numlist['06632']
+        self.assertEqual(self.mat_commuter_migration[city_from][city_to], 47)
 
         # check migration from Herzogtum Lauenburg to Flensburg, Stadt
-        city_from = countykey2numlist['01001']
-        city_to = countykey2numlist['01053']
-        self.assertEqual(mat_commuter_migration[city_from][city_to], 17)
+        city_from = self.countykey2numlist['01001']
+        city_to = self.countykey2numlist['01053']
+        self.assertEqual(self.mat_commuter_migration[city_from][city_to], 17)
 
 
 if __name__ == '__main__':

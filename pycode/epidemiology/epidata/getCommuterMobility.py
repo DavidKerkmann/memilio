@@ -76,7 +76,9 @@ def assign_geographical_entities(countykey_list, govkey_list):
             col_list.append(countykey_list[i])  # add county to current government region
             col_index += 1
         # go to next government region
-        if i < len(countykey_list) - 1 and (not str(countykey_list[i + 1]).startswith(str(govkey_list[gov_index]))):
+        if i < len(countykey_list) - 1 and (
+            not str(countykey_list[i + 1]).startswith(
+                str(govkey_list[gov_index]))):
             # add government region to full table
             gov_county_table.append(col_list)
             col_list = []
@@ -107,7 +109,9 @@ def assign_geographical_entities(countykey_list, govkey_list):
         if str(int(govkey_list[i])).startswith(str(state_id)):
             state_govlist_loc.append(govkey_list[i])
 
-        if i + 1 < len(govkey_list) and not str(int(govkey_list[i + 1])).startswith(str(state_id)):
+        if i + 1 < len(govkey_list) and not str(
+                int(govkey_list[i + 1])).startswith(
+                str(state_id)):
             state_id += 1
             state_gov_table.append(state_govlist_loc)
             state_govlist_loc = []
@@ -383,7 +387,8 @@ def get_commuter_data(setup_dict='',
     print('Maximum relative error:', max_rel_err)
 
     countykey_list = [int(id) for id in countykey_list]
-    df_commuter_migration = pd.DataFrame(data=mat_commuter_migration, columns=countykey_list)    
+    df_commuter_migration = pd.DataFrame(
+        data=mat_commuter_migration, columns=countykey_list)
     df_commuter_migration.index = countykey_list
     filename = 'migration_bfa_20' + files[0].split(
         '-20')[1][0:2] + '_dim' + str(mat_commuter_migration.shape[0])
@@ -395,8 +400,10 @@ def get_commuter_data(setup_dict='',
     new_idx = countykey_list.index(geoger.CountyMerging[merge_id][0])
     old_idx = countykey_list.index(geoger.CountyMerging[merge_id][1])
 
-    mat_commuter_migration[new_idx, :] = mat_commuter_migration[new_idx, :] + mat_commuter_migration[old_idx, :]
-    mat_commuter_migration[:, new_idx] = mat_commuter_migration[:, new_idx] + mat_commuter_migration[:, old_idx]
+    mat_commuter_migration[new_idx, :] = mat_commuter_migration[new_idx,
+                                                                :] + mat_commuter_migration[old_idx, :]
+    mat_commuter_migration[:, new_idx] = mat_commuter_migration[:,
+                                                                new_idx] + mat_commuter_migration[:, old_idx]
     mat_commuter_migration[new_idx,new_idx] = 0
 
     mat_commuter_migration = np.delete(mat_commuter_migration, old_idx, axis=0)
@@ -408,9 +415,11 @@ def get_commuter_data(setup_dict='',
     filename = 'migration_bfa_20' + files[0].split(
         '-20')[1][0:2] + '_dim' + str(mat_commuter_migration.shape[0])
     gd.write_dataframe(df_commuter_migration, directory, filename, file_format)
-
-    df_commuter_migration.to_csv(directory.split('pydata')[
-                                 0] + 'mobility/commuter_migration_scaled' + '_20' + files[0].split('-20')[1][0:2] + '.txt', sep=' ', index=False, header=False)
+    
+    df_commuter_migration.to_csv(
+        directory.split('pydata') [0] +'mobility/commuter_migration_scaled' +
+        '_20' +files[0].split('-20') [1] [0: 2] +'.txt', sep=' ', index=False,
+        header=False)
 
     return df_commuter_migration
 

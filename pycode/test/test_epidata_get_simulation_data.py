@@ -51,26 +51,38 @@ class TestGetSimulationData(fake_filesystem_unittest.TestCase):
     @patch('epidemiology.epidata.getVaccinationData.get_vaccination_data')
     def test_get_call_sub_functions(self, mock_vaccination, mock_agep, mock_popul, mock_rki, mock_divi):
 
-        [read_data, file_format, out_folder, no_raw, end_date, fill_dates, make_plot, moving_average, split_berlin,
-         start_date, update_data] = [False, "json", self.path, False, dd.defaultDict['end_date'],
-                                     dd.defaultDict['fill_dates'], dd.defaultDict['make_plot'],
+        [read_data, file_format, out_folder, no_raw, end_date, impute_dates, make_plot, moving_average, split_berlin,
+         start_date, update_data] = [False, "json_timeasstring", os.path.join(dd.defaultDict['out_folder']), False, dd.defaultDict['end_date'],
+                                     dd.defaultDict['impute_dates'], dd.defaultDict['make_plot'],
                                      dd.defaultDict['moving_average'], dd.defaultDict['split_berlin'],
                                      dd.defaultDict['start_date'], dd.defaultDict['update_data']]
 
-        gsd.get_simulation_data(read_data, file_format, out_folder, no_raw, end_date, fill_dates, make_plot,
+        gsd.get_simulation_data(read_data, file_format, out_folder, no_raw, end_date, impute_dates, make_plot,
                                 moving_average, split_berlin, start_date, update_data)
 
-        arg_dict_all = {"read_data": False, "file_format": "json", "out_folder": self.path, "no_raw": False}
+        arg_dict_all = {"read_data": dd.defaultDict['read_data'], "file_format": dd.defaultDict['file_format'],
+                        "out_folder": os.path.join(dd.defaultDict['out_folder']),
+                        'no_raw': dd.defaultDict["no_raw"]}
 
-        arg_dict_rki = {**arg_dict_all, "make_plot": dd.defaultDict['make_plot'],
-                        "fill_dates": dd.defaultDict['fill_dates'], "moving_average": dd.defaultDict['moving_average'],
-                        "split_berlin": dd.defaultDict['split_berlin']}
+        arg_dict_rki = {
+            **arg_dict_all, "make_plot": dd.defaultDict['make_plot'],
+            "impute_dates": dd.defaultDict['impute_dates'],
+            "moving_average": dd.defaultDict['moving_average'],
+            "split_berlin": dd.defaultDict['split_berlin']}
 
-        arg_dict_divi = {**arg_dict_all, "end_date": dd.defaultDict['end_date'],
-                         "start_date": dd.defaultDict['start_date'], "update_data": dd.defaultDict['update_data']}
+        arg_dict_divi = {
+            **arg_dict_all, "end_date": dd.defaultDict['end_date'],
+            "start_date": dd.defaultDict['start_date'],
+            "moving_average": dd.defaultDict['moving_average'],           
+            "update_data": dd.defaultDict['update_data']}
+        
+        arg_dict_vaccination = {
+            **arg_dict_all,
+            "make_plot": dd.defaultDict['make_plot'],
+            "moving_average": dd.defaultDict['moving_average']}
 
         mock_vaccination.assert_called()
-        mock_vaccination.assert_called_with(**arg_dict_all)
+        mock_vaccination.assert_called_with(**arg_dict_vaccination)
 
         mock_agep.assert_called()
         mock_agep.assert_called_with(**arg_dict_all)

@@ -123,7 +123,7 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         self.assertEqual(cm.exception.code, exit_string)
 
 
-    @patch('epidemiology.epidata.getDataIntoPandasDataFrame.pandas.read_csv')
+    @patch('epidemiology.epidata.getDataIntoPandasDataFrame.pd.read_csv')
     def test_load_csv_error(self, mock_csv):
         # return an empty dataframe
         mock_csv.return_value = pd.DataFrame()
@@ -141,7 +141,7 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
 
         assert df_test.empty
 
-    @patch('epidemiology.epidata.getDataIntoPandasDataFrame.pandas.read_csv')
+    @patch('epidemiology.epidata.getDataIntoPandasDataFrame.pd.read_csv')
     def test_load_csv_working(self, mock_csv):
         mock_csv.side_effect = OSError
 
@@ -157,8 +157,11 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         
         out_path_default = dd.defaultDict['out_folder']
         arg_dict = gd.cli("population")
-        [read_data, file_format, out_folder, no_raw] = [arg_dict["read_data"], arg_dict["file_format"],
-                                                        arg_dict["out_folder"], arg_dict["no_raw"]]
+        [read_data, file_format, out_folder, no_raw] = [ 
+            arg_dict["read_data"],
+            arg_dict["file_format"], 
+            arg_dict["out_folder"], 
+            arg_dict["no_raw"]]
 
         assert read_data == dd.defaultDict['read_data']
         assert file_format == dd.defaultDict['file_format']
@@ -175,9 +178,17 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         assert no_raw == dd.defaultDict['no_raw']
 
         arg_dict = gd.cli("rki")
-        [read_data, file_format, out_folder, fill_dates, make_plot, moving_average, split_berlin, no_raw] =\
-            [arg_dict["read_data"], arg_dict["file_format"], arg_dict["out_folder"], arg_dict["fill_dates"],
-             arg_dict["make_plot"], arg_dict["moving_average"], arg_dict["split_berlin"], arg_dict["no_raw"]]
+        [read_data, file_format, out_folder, impute_dates, make_plot,
+         moving_average, split_berlin, no_raw, rep_date] = [
+            arg_dict["read_data"],
+            arg_dict["file_format"],
+            arg_dict["out_folder"],
+            arg_dict["impute_dates"],
+            arg_dict["make_plot"],
+            arg_dict["moving_average"],
+            arg_dict["split_berlin"],
+            arg_dict["no_raw"],
+            arg_dict["rep_date"]]
 
         assert read_data == dd.defaultDict['read_data']
         assert file_format == dd.defaultDict['file_format']
@@ -185,12 +196,17 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         assert make_plot == dd.defaultDict['make_plot']
         assert split_berlin == dd.defaultDict['split_berlin']
         assert moving_average == dd.defaultDict['moving_average']
-        assert fill_dates == dd.defaultDict['fill_dates']
+        assert impute_dates == dd.defaultDict['impute_dates']
         assert no_raw == dd.defaultDict['no_raw']
+        assert rep_date == dd.defaultDict['rep_date']
 
         arg_dict = gd.cli("rkiest")
-        [read_data, file_format, out_folder, no_raw] = [arg_dict["read_data"], arg_dict["file_format"],
-                                                        arg_dict["out_folder"], arg_dict["no_raw"]]
+        [read_data, file_format, make_plot, out_folder, no_raw] = [
+            arg_dict["read_data"],
+            arg_dict["file_format"],
+            arg_dict["make_plot"],
+            arg_dict["out_folder"],
+            arg_dict["no_raw"]]
 
         assert read_data == dd.defaultDict['read_data']
         assert file_format == dd.defaultDict['file_format']
@@ -198,10 +214,29 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         assert no_raw == dd.defaultDict['no_raw']
         assert make_plot == dd.defaultDict['make_plot']
 
+        arg_dict = gd.cli("commuter_official")
+        [read_data, file_format, out_folder, no_raw] = [
+            arg_dict["read_data"],
+            arg_dict["file_format"], 
+            arg_dict["out_folder"], 
+            arg_dict["no_raw"]]
+        
+        assert read_data == dd.defaultDict['read_data']
+        assert file_format == dd.defaultDict['file_format']
+        assert out_folder == out_path_default
+        assert no_raw == dd.defaultDict['no_raw']
+
         arg_dict = gd.cli("divi")
-        [read_data, file_format, out_folder, end_date, start_date, update_data, no_raw] =\
-            [arg_dict["read_data"], arg_dict["file_format"], arg_dict["out_folder"], arg_dict["end_date"],
-             arg_dict["start_date"], arg_dict["update_data"], arg_dict["no_raw"]]
+        [read_data, file_format, out_folder, end_date, start_date, update_data,
+         impute_dates, moving_average, no_raw] = [arg_dict["read_data"],
+                                                  arg_dict["file_format"],
+                                                  arg_dict["out_folder"],
+                                                  arg_dict["end_date"],
+                                                  arg_dict["start_date"],
+                                                  arg_dict["update_data"],
+                                                  arg_dict["impute_dates"],
+                                                  arg_dict["moving_average"],
+                                                  arg_dict["no_raw"]]
 
         assert read_data == dd.defaultDict['read_data']
         assert file_format == dd.defaultDict['file_format']
@@ -209,21 +244,31 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         assert end_date == dd.defaultDict['end_date']
         assert start_date == dd.defaultDict['start_date']
         assert update_data == dd.defaultDict['update_data']
+        assert impute_dates == dd.defaultDict['impute_dates']
+        assert moving_average == dd.defaultDict['moving_average']
         assert no_raw == dd.defaultDict['no_raw']
 
         arg_dict = gd.cli("sim")
-        [read_data, file_format, out_folder, end_date, fill_dates, make_plot, moving_average, split_berlin, start_date,
-         update_data, no_raw] =\
-            [arg_dict["read_data"], arg_dict["file_format"], arg_dict["out_folder"], arg_dict["end_date"],
-             arg_dict["fill_dates"], arg_dict["make_plot"], arg_dict["moving_average"], arg_dict["split_berlin"],
-             arg_dict["start_date"], arg_dict["update_data"], arg_dict["no_raw"]]
+        [read_data, file_format, out_folder, end_date, make_plot, impute_dates,
+         moving_average, split_berlin, start_date, update_data, no_raw] = [
+            arg_dict["read_data"],
+            arg_dict["file_format"],
+            arg_dict["out_folder"],
+            arg_dict["end_date"],
+            arg_dict["impute_dates"],
+            arg_dict["make_plot"],
+            arg_dict["moving_average"],
+            arg_dict["split_berlin"],
+            arg_dict["start_date"],
+            arg_dict["update_data"],
+            arg_dict["no_raw"]]
 
         assert read_data == dd.defaultDict['read_data']
         assert file_format == dd.defaultDict['file_format']
         assert out_folder == out_path_default
         assert no_raw == dd.defaultDict['no_raw']
         assert end_date == dd.defaultDict['end_date']
-        assert fill_dates == dd.defaultDict['fill_dates']
+        assert impute_dates == dd.defaultDict['impute_dates']
         assert make_plot == dd.defaultDict['make_plot']
         assert moving_average == dd.defaultDict['moving_average']
         assert split_berlin == dd.defaultDict['split_berlin']
@@ -307,8 +352,11 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         with patch.object(sys, 'argv', test_args):
 
             arg_dict = gd.cli("population")
-            [read_data, file_format, out_folder, no_raw] = [arg_dict["read_data"], arg_dict["file_format"],
-                                                            arg_dict["out_folder"], arg_dict["no_raw"]]
+            [read_data, file_format, out_folder, no_raw] = [
+                arg_dict["read_data"],
+                arg_dict["file_format"],
+                arg_dict["out_folder"],
+                arg_dict["no_raw"]]
 
             assert read_data == True
             assert file_format == 'hdf5'
@@ -316,33 +364,47 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
             assert no_raw == True
 
             arg_dict = gd.cli("jh")
-            [read_data, file_format, out_folder, no_raw] = [arg_dict["read_data"], arg_dict["file_format"],
-                                                            arg_dict["out_folder"], arg_dict["no_raw"]]
+            [read_data, file_format, out_folder, no_raw] = [
+                arg_dict["read_data"],
+                arg_dict["file_format"],
+                arg_dict["out_folder"],
+                arg_dict["no_raw"]]
 
             assert read_data == True
             assert file_format == 'hdf5'
             assert out_folder == "some_folder"
             assert no_raw == True
 
-        test_args = ["prog", '--read-data', '--out-folder', folder, '--file-format', 'hdf5', '--make-plot',
-                     '--split-berlin', '--moving-average', '--no-raw', '--fill-dates']
+        test_args = ["prog", '--read-data', '--out-folder', folder,
+                     '--file-format', 'hdf5', '--make-plot', '--split-berlin',
+                     '--moving-average', 0, '--no-raw', '--impute-dates']
 
         with patch.object(sys, 'argv', test_args):
             arg_dict = gd.cli("rki")
-            [read_data, file_format, out_folder, fill_dates, make_plot, moving_average, split_berlin, no_raw] = \
-                [arg_dict["read_data"], arg_dict["file_format"], arg_dict["out_folder"], arg_dict["fill_dates"],
-                 arg_dict["make_plot"], arg_dict["moving_average"], arg_dict["split_berlin"], arg_dict["no_raw"]]
-
+            [read_data, file_format, out_folder, impute_dates, make_plot,
+             moving_average, split_berlin, no_raw, rep_date] = [
+                arg_dict["read_data"],
+                arg_dict["file_format"],
+                arg_dict["out_folder"],
+                arg_dict["impute_dates"],
+                arg_dict["make_plot"],
+                arg_dict["moving_average"],
+                arg_dict["split_berlin"],
+                arg_dict["no_raw"],
+                arg_dict["rep_date"]]
+            
             assert read_data == True
             assert file_format == 'hdf5'
             assert out_folder == "some_folder"
-            assert fill_dates == True
+            assert impute_dates == True
             assert split_berlin == True
-            assert moving_average == True
+            assert moving_average == dd.defaultDict['moving_average']
             assert make_plot == True
             assert no_raw == True
+            assert rep_date == False
 
-        test_args = ["prog", '--read-data', '--out-folder', folder, '--file-format', 'json', '--make-plot']
+        test_args = ["prog", '--read-data', '--out-folder',
+                     folder, '--file-format', 'json', '--make-plot']
 
         with patch.object(sys, 'argv', test_args):
             arg_dict = gd.cli("rkiest")
@@ -356,14 +418,21 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
             assert make_plot == True
             assert no_raw == False
 
-        test_args = ["prog", '--out-folder', folder, '--file-format', 'json', '--update-data',
-                     '--start-date', '2020-11-24', '--end-date', '2020-11-26', '-n']
+        test_args = [
+            "prog", '--out-folder', folder, '--file-format', 'json',
+            '--update-data', '--start-date', '2020-11-24', '--end-date',
+            '2020-11-26', '-n']
 
         with patch.object(sys, 'argv', test_args):
             arg_dict = gd.cli("divi")
-            [read_data, file_format, out_folder, end_date, start_date, update_data, no_raw] = \
-                [arg_dict["read_data"], arg_dict["file_format"], arg_dict["out_folder"], arg_dict["end_date"],
-                 arg_dict["start_date"], arg_dict["update_data"], arg_dict["no_raw"]]
+            [read_data, file_format, out_folder, end_date, start_date,
+             update_data, no_raw] = [arg_dict["read_data"],
+                arg_dict["file_format"],
+                arg_dict["out_folder"],
+                arg_dict["end_date"],
+                arg_dict["start_date"],
+                arg_dict["update_data"],
+                arg_dict["no_raw"]]
 
             assert read_data == dd.defaultDict['read_data']
             assert file_format == 'json'
@@ -372,16 +441,26 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
             assert start_date == date(2020,11,24)
             assert no_raw == True
 
-        test_args = ["prog", '--out-folder', folder, '--file-format', 'json', '--update-data', '--make-plot',
-                     '--start-date', '2020-11-24', '--end-date', '2020-11-26']
+        test_args = [
+            "prog", '--out-folder', folder, '--file-format', 'json',
+            '--update-data', '--make-plot', '--start-date', '2020-11-24',
+            '--end-date', '2020-11-26']
 
         with patch.object(sys, 'argv', test_args):
             arg_dict = gd.cli("sim")
-            [read_data, file_format, out_folder, no_raw, end_date, fill_dates, make_plot, moving_average, split_berlin,
-             start_date, update_data] =\
-                [arg_dict["read_data"], arg_dict["file_format"], arg_dict["out_folder"], arg_dict["no_raw"],
-                 arg_dict["end_date"], arg_dict["fill_dates"], arg_dict["make_plot"], arg_dict["moving_average"],
-                 arg_dict["split_berlin"], arg_dict["start_date"], arg_dict["update_data"]]
+            [read_data, file_format, out_folder, no_raw, end_date,
+             impute_dates, make_plot, moving_average, split_berlin,
+             start_date, update_data] = [arg_dict["read_data"],
+                                         arg_dict["file_format"],
+                                         arg_dict["out_folder"],
+                                         arg_dict["no_raw"],
+                                         arg_dict["end_date"],
+                                         arg_dict["impute_dates"],
+                                         arg_dict["make_plot"],
+                                         arg_dict["moving_average"],
+                                         arg_dict["split_berlin"],
+                                         arg_dict["start_date"],
+                                         arg_dict["update_data"]]
 
             assert read_data == dd.defaultDict['read_data']
             assert file_format == 'json'
@@ -392,7 +471,7 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
             assert make_plot == True
             assert split_berlin == dd.defaultDict['split_berlin']
             assert moving_average == dd.defaultDict['moving_average']
-            assert fill_dates == dd.defaultDict['fill_dates']
+            assert impute_dates == dd.defaultDict['impute_dates']
             assert no_raw == False
 
     def test_check_dir(self):
@@ -483,21 +562,36 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
                             mock_divi):
 
         arg_dict_all = {"read_data": dd.defaultDict['read_data'], "file_format": dd.defaultDict['file_format'],
-                        "out_folder": os.path.join(dd.defaultDict['out_folder'], 'pydata'),
+                        "out_folder": os.path.join(dd.defaultDict['out_folder']),
                         'no_raw': dd.defaultDict["no_raw"]}
+
+        arg_dict_vaccination = {
+            **arg_dict_all,
+            "end_date": dd.defaultDict['end_date'],
+            "make_plot": dd.defaultDict['make_plot'],
+            "moving_average": dd.defaultDict['moving_average'],
+            "start_date": dd.defaultDict['start_date']}
 
         arg_dict_rki_est = {**arg_dict_all,  "make_plot": dd.defaultDict['make_plot']}
 
-        arg_dict_rki = {**arg_dict_rki_est, "fill_dates": dd.defaultDict['fill_dates'],
-                        "moving_average": dd.defaultDict['moving_average'],
-                        "split_berlin": dd.defaultDict['split_berlin']}
+        arg_dict_rki = {
+            **arg_dict_all,
+            "impute_dates": dd.defaultDict['impute_dates'],
+            "make_plot": dd.defaultDict['make_plot'],
+            "moving_average": dd.defaultDict['moving_average'],
+            "split_berlin": dd.defaultDict['split_berlin'],
+            "rep_date": dd.defaultDict['rep_date']}
 
-        arg_dict_divi = {**arg_dict_all, "end_date": dd.defaultDict['end_date'],
-                         "start_date": dd.defaultDict['start_date'], "update_data": dd.defaultDict['update_data']}
+        arg_dict_divi = {
+            **arg_dict_all, "end_date": dd.defaultDict['end_date'],
+            "impute_dates": dd.defaultDict['impute_dates'],
+            "moving_average": dd.defaultDict['moving_average'],
+            "start_date": dd.defaultDict['start_date'],
+            "update_data": dd.defaultDict['update_data']}
 
         getVaccinationData.main()
         mock_vaccination.assert_called()
-        mock_vaccination.assert_called_with(**arg_dict_all)
+        mock_vaccination.assert_called_with(**arg_dict_vaccination)
 
         getPopulationData.main()
         mock_agep.assert_called()

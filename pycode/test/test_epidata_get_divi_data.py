@@ -165,23 +165,36 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
 
     # data for result dataframe to test the function adjust_data
     dr24 = {
-        'bundesland': [1, 2],
-        'gemeindeschluessel': [1001, 2000],
-        'ICU': [0, 7],
         'daten_stand': ["2020-04-24 09:15:00", "2020-04-24 09:15:00"],
-        'faelle_covid_aktuell_beatmet': ['', '']}
-    dr25 = {
-        'bundesland': [1, 2],
-        'gemeindeschluessel': [1001, 2000],
         'ICU': [0, 7],
+        'bundesland': [1, 2],
+        'faelle_covid_aktuell_beatmet': ['', ''],
+        'gemeindeschluessel': [1001, 2000], }
+
+    dr25 = {
         'daten_stand': ["2020-04-25 09:15:00", "2020-04-25 09:15:00"],
-        'faelle_covid_aktuell_beatmet': ['', '']}
-    dr26 = {'bundesland': [1, 2], 'gemeindeschluessel': [1001, 2000], 'ICU': [
-        0, 7], 'daten_stand': ["2020-04-26 09:15:00", "2020-04-26 09:15:00"]}
-    dr27 = {'bundesland': [1, 2], 'gemeindeschluessel': [1001, 2000], 'ICU': [
-        0, 7], 'daten_stand': ["2020-04-27 09:15:00", "2020-04-27 09:15:00"]}
-    dr2829 = {'bundesland': [1, 2],
-              'gemeindeschluessel': [1001, 2000], 'ICU': [0, 7]}
+        'ICU': [0, 7],
+        'bundesland': [1, 2],
+        'faelle_covid_aktuell_beatmet': ['', ''],
+        'gemeindeschluessel': [1001, 2000], }
+    dr26 = {
+        'daten_stand': ["2020-04-26 09:15:00", "2020-04-26 09:15:00"],
+        'ICU': [0, 7],
+        'bundesland': [1, 2],
+        'faelle_covid_aktuell_beatmet': ['', ''],
+        'gemeindeschluessel': [1001, 2000], }
+    dr27 = {
+        'daten_stand': ["2020-04-27 09:15:00", "2020-04-27 09:15:00"],
+        'ICU': [0, 7],
+        'bundesland': [1, 2],
+        'faelle_covid_aktuell_beatmet': ['', ''],
+        'gemeindeschluessel': [1001, 2000], }
+    dr2829 = {
+        'daten_stand': ['', ''],
+        'ICU': [0, 7],
+        'bundesland': [1, 2],
+        'faelle_covid_aktuell_beatmet': ['', ''],
+        'gemeindeschluessel': [1001, 2000]}
     list_result = [dr24, dr25, dr26, dr27, dr2829, dr2829]
 
     def setUp(self):
@@ -203,6 +216,14 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
                 # replace columns
                 self.list_result[i]['faelle_covid_aktuell_invasiv_beatmet'] = \
                     self.list_result[i].pop('faelle_covid_aktuell_beatmet')
+               
+            except KeyError:
+                pass
+
+            try:
+                # replace columns
+                self.list_result[i]['Date'] = \
+                    self.list_result[i].pop('daten_stand')
             except KeyError:
                 pass
 
@@ -211,13 +232,13 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
 
             # check equality
             self.assertTrue((df == df_res).all().all())
-
+            #self.assertEqual(df, df_res)
             # increase date by one day
             start_date += timedelta(days=1)
 
         # test that column 'faelle_covid_aktuell_beatmet' is replaced
-        df = pd.DataFrame({'faelle_covid_aktuell_beatmet': [3, 5],
-                           'daten_stand': ["2021-03-30 09:15:00", "2021-03-31 09:15:00"]})
+        df = pd.DataFrame({'faelle_covid_aktuell_intensiv_beatmet': [3, 5],
+                           'Date': ["2021-03-30 09:15:00", "2021-03-31 09:15:00"]})
         start_date = date(2021, 3, 30)
         df2 = gdd.adjust_data(df, start_date)
 
@@ -459,8 +480,13 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         mock_ddfod.return_value = [3961, pd.read_json(self.test_string1), ""]
 
         # case simple download
-        [read_data, update_data, file_format, out_folder, start_date, end_date, no_raw]\
-            = [False, False, "json", self.path, date(2020, 7, 7), date(2020, 7, 7), False]
+        [
+            read_data, update_data, file_format, out_folder, start_date,
+            end_date, no_raw, impute_dates, moving_average] = [
+            False, False, "json", self.path, date(2020, 7, 7),
+            date(2020, 7, 7),
+            False, dd.defaultDict['impute_dates'],
+            dd.defaultDict['moving_average']]
 
         directory = os.path.join(out_folder, 'Germany/')
 
@@ -469,8 +495,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         file_out1 = "county_divi.json"
         file_out2 = "state_divi.json"
         file_out3 = "germany_divi.json"
-        gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                          end_date, start_date, update_data)
+        gdd.get_divi_data(
+            read_data, file_format, out_folder, no_raw, end_date, start_date,
+            update_data, impute_dates, moving_average)
 
         # check if folder Germany exists now
         self.assertEqual(len(os.listdir(self.path)), 1)
@@ -511,8 +538,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         start_date = date(2020, 7, 7)
         end_date = date(2020, 7, 9)
 
-        gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                          end_date, start_date, update_data)
+        gdd.get_divi_data(
+            read_data, file_format, out_folder, no_raw, end_date, start_date,
+            update_data, impute_dates, moving_average)
 
         # check if folder Germany exists now
         self.assertEqual(len(os.listdir(self.path)), 1)
@@ -576,8 +604,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         with self.assertRaises(SystemExit) as cm:
             start_date = date(2020, 7, 9)
             end_date = date(2020, 7, 9)
-            gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                              end_date, start_date, update_data)
+            gdd.get_divi_data(
+                read_data, file_format, out_folder, no_raw, end_date,
+                start_date, update_data, impute_dates, moving_average)
         self.assertEqual(cm.exception.code,
                          "Something went wrong, dataframe is empty.")
 
@@ -585,8 +614,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         with self.assertRaises(SystemExit) as cm:
             start_date = date(2020, 4, 23)
             end_date = date(2020, 4, 24)
-            gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                              end_date, start_date, update_data)
+            gdd.get_divi_data(
+                read_data, file_format, out_folder, no_raw, end_date,
+                start_date, update_data, impute_dates, moving_average)
         self.assertEqual(cm.exception.code,
                          "Something went wrong, dataframe is empty.")
 
@@ -599,8 +629,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         # check case where call_number has to be searched for and should be saved to call_dict.
         start_date = date(2020, 7, 10)
         end_date = date(2020, 7, 10)
-        gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                          end_date, start_date, update_data)
+        gdd.get_divi_data(
+            read_data, file_format, out_folder, no_raw, end_date, start_date,
+            update_data, impute_dates, moving_average)
 
         expected_calls = [
             call(
@@ -638,8 +669,12 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
                 3961, pd.read_json(self.test_string1), ""]
 
             # case simple download
-            [read_data, update_data, file_format, out_folder, start_date, end_date, no_raw] \
-                = [False, False, "json", self.path, date(2020, 7, 7), date(2020, 7, 7), True]
+            [read_data, update_data, file_format, out_folder, start_date,
+             end_date, no_raw, impute_dates, moving_average] = [False, False,
+                "json", self.path, date(2020, 7, 7),
+                date(2020, 7, 7),
+                True, dd.defaultDict['impute_dates'],
+                dd.defaultDict['moving_average']]
 
             directory = os.path.join(out_folder, 'Germany/')
 
@@ -647,8 +682,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
             file_out2 = "state_divi.json"
             file_out3 = "germany_divi.json"
 
-            gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                              end_date, start_date, update_data)
+            gdd.get_divi_data(
+                read_data, file_format, out_folder, no_raw, end_date,
+                start_date, update_data, impute_dates, moving_average)
 
             # check if folder Germany exists now
             self.assertEqual(len(os.listdir(self.path)), 1)
@@ -661,11 +697,13 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
 
     def test_gdd_read_data(self):
 
-        [read_data, update_data, file_format, out_folder, start_date, end_date,
-         no_raw] = [True, False, "json", self.path, dd.defaultDict
-            ['start_date'],
+        [
+            read_data, update_data, file_format, out_folder, start_date,
+            end_date, no_raw, impute_dates, moving_average] = [
+            True, False, "json", self.path, dd.defaultDict['start_date'],
             dd.defaultDict['end_date'],
-            False]
+            False, dd.defaultDict['impute_dates'],
+            dd.defaultDict['moving_average']]
 
         directory = os.path.join(out_folder, 'Germany/')
         gd.check_dir(directory)
@@ -679,8 +717,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
 
         # Test case where file does not exist
         with self.assertRaises(SystemExit) as cm:
-            gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                              end_date, start_date, update_data)
+            gdd.get_divi_data(
+                read_data, file_format, out_folder, no_raw, end_date,
+                start_date, update_data, impute_dates, moving_average)
         self.assertEqual(
             cm.exception.code, "Error: The file: " + file_with_path +
             " does not exist. Call program without -r or -u flag to get it.")
@@ -690,8 +729,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
             f.write("[]")
 
         with self.assertRaises(SystemExit) as cm:
-            gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                          end_date, start_date, update_data)
+            gdd.get_divi_data(
+                read_data, file_format, out_folder, no_raw, end_date,
+                start_date, update_data, impute_dates = (), moving_average = ())
         self.assertEqual(cm.exception.code,
                          "Something went wrong, dataframe is empty.")
 
@@ -702,8 +742,9 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
                 "faelle_covid_aktuell_beatmet",
                 "faelle_covid_aktuell_invasiv_beatmet"))
 
-        gdd.get_divi_data(read_data, file_format, out_folder, no_raw,
-                          end_date, start_date, update_data)
+        gdd.get_divi_data(
+            read_data, file_format, out_folder, no_raw, end_date, start_date,
+            update_data, impute_dates, moving_average)
 
         self.assertEqual(len(os.listdir(directory)), 4)
         self.assertEqual(os.listdir(directory).sort(), [
@@ -754,7 +795,8 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
                 read_data, file_format, out_folder, end_date=dd.defaultDict
                 ['end_date'],
                 start_date=dd.defaultDict['start_date'],
-                update_data=True)
+                update_data=True, impute_dates=dd.defaultDict['impute_dates'],
+                moving_average=dd.defaultDict['moving_average'])
         self.assertEqual(
             cm.exception.code, "Error: The file: " + file_with_path +
             " does not exist. Call program without -r or -u flag to get it.")
@@ -768,7 +810,8 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
                 read_data, file_format, out_folder, no_raw,
                 end_date=dd.defaultDict['end_date'],
                 start_date=dd.defaultDict['start_date'],
-                update_data=True)
+                update_data=True, impute_dates=dd.defaultDict['impute_dates'],
+                moving_average=dd.defaultDict['moving_average'])
         self.assertEqual(cm.exception.code,
                          "Something went wrong, dataframe is empty.")
 
@@ -801,7 +844,8 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
             read_data, file_format, out_folder, no_raw,
             end_date=dd.defaultDict['end_date'],
             start_date=dd.defaultDict['start_date'],
-            update_data=True)
+            update_data=True, impute_dates=dd.defaultDict['impute_dates'],
+            moving_average=dd.defaultDict['moving_average'])
 
         mock_loadcsv.assert_called_with(
             'DIVI-Intensivregister-Tagesreport', apiUrl='https://www.divi.de/')
