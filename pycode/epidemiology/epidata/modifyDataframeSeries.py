@@ -121,7 +121,7 @@ def impute_and_reduce_df(df_old, group_by_cols, mod_cols, impute='forward', movi
                 for avg in mod_cols:
                     # compute moving average in new column
                     df_local_new['MA' + avg] = df_local_new[avg].rolling(
-                        window=moving_average, min_periods=1, center=True).mean()
+                        window=moving_average, min_periods=moving_average, center=True).mean().fillna(df_local_new[avg])
                     df_local_new['MA' + avg] = df_local_new['MA' +
                                                             avg].fillna(df_local_new[avg])
                     # overwrite daily values by moving averages
@@ -144,7 +144,9 @@ def impute_and_reduce_df(df_old, group_by_cols, mod_cols, impute='forward', movi
                 counter += 1
             for avg in mod_cols:
                 values[avg] = 0
-
+            # TODO: by this the corresponding columns will be zero-filled
+            #       other entries such as names etc will get lost here
+            #       any idea to introduce these names has to be found.
             df_local_new.fillna(values, inplace=True)
 
         # append current local entity (i.e., county or state)
