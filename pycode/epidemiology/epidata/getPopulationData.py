@@ -299,7 +299,7 @@ def get_age_population_data(read_data=dd.defaultDict['read_data'],
    @param read_data False [Default] or True. Defines if data is read from file or downloaded.
    @param file_format File format which is used for writing the data. Default defined in defaultDict.
    @param out_folder Path to folder where data is written in folder out_folder/Germany.
-"""
+    """
     counties, reg_key, zensus = load_age_population_data(out_folder)
 
     # find region keys for census population data

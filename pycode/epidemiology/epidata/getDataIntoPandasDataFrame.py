@@ -126,21 +126,12 @@ def loadExcel(targetFileName, apiUrl='https://opendata.arcgis.com/datasets/',
             df = pd.read_excel(ZipFile(BytesIO(urlopen(url).read())).open(file_compressed), **param_dict)
         else:
             df = pd.read_excel(url, **param_dict)
-    except OSError as e:
+    except OSError:
         exit_string = "ERROR: URL " + url + " could not be opened."
         sys.exit(exit_string)
 
     return df
 
-
-# function to return list of keys for any value
-# def get_key(val, my_dict):
-#    key_list = []
-#    for key, value_list in my_dict.items():
-#        if val in value_list:
-#            key_list.append(key)
-
-#    return key_list
 
 def cli(what):
     """! Defines command line interface
