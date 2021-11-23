@@ -62,9 +62,6 @@ def check_for_completeness(df):
     return False
 
 
-
-
-
 def get_rki_data(read_data=dd.defaultDict['read_data'],
                  file_format=dd.defaultDict['file_format'],
                  out_folder=dd.defaultDict['out_folder'],

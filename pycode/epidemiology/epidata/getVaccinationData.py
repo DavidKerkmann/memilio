@@ -34,8 +34,6 @@ from epidemiology.epidata import geoModificationGermany as geoger
 from epidemiology.epidata import getCommuterMobility as coMobi
 
 # Downloads vaccination data from RKI
-
-
 def download_vaccination_data():
     # RKI content from github
     url = 'https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/Aktuell_Deutschland_Landkreise_COVID-19-Impfungen.csv'
@@ -89,8 +87,6 @@ def create_intervals_mapping(from_lower_bounds, to_lower_bounds):
     return from_to_mapping
 
 # splits a column based on its values to multiple columns
-
-
 def split_column_based_on_values(
         df_global, column_ident, column_vals, new_column_labels):
     """! Fills missing dates of df and optionally calculates the the 7 day moving average of the data
@@ -638,19 +634,19 @@ def get_vaccination_data(read_data=dd.defaultDict['read_data'],
 
     # have a look extrapolated vaccination ratios (TODO: to be removed or outsourced with plotting for production)
     # aggregate total number of vaccinations per county and age group
-    vacc_sums_nonsanit = df_data_agevacc_county_cs.loc[(
-        df_data_agevacc_county_cs.Date == '2021-10-28'), ['ID_County', column_names_new[1]]]
-    # create new data frame and reshape it
-    df_fullsum = pd.DataFrame(columns=[dd.EngEng['idCounty']] + unique_age_groups_old)
-    df_fullsum[dd.EngEng['idCounty']
-                    ] = vacc_sums_nonsanit[dd.EngEng['idCounty']].unique()
-    df_fullsum[unique_age_groups_old] = np.array(
-        vacc_sums_nonsanit[column_names_new[1]]).reshape(
-        len(vacc_sums_nonsanit[dd.EngEng['idCounty']].unique()),
-        len(unique_age_groups_old))
-    # compute county and age-group-specific vaccination ratios
-    df_fullsum[['r'+age for age in unique_age_groups_old] ] = df_fullsum[unique_age_groups_old] / geoger.merge_df_counties_all(
-        population_old_ages, sorting=[dd.EngEng["idCounty"]], columns=dd.EngEng["idCounty"])[unique_age_groups_old].values
+    # vacc_sums_nonsanit = df_data_agevacc_county_cs.loc[(
+    #     df_data_agevacc_county_cs.Date == '2021-12-27'), ['ID_County', column_names_new[1]]]
+    # # create new data frame and reshape it
+    # df_fullsum = pd.DataFrame(columns=[dd.EngEng['idCounty']] + unique_age_groups_old)
+    # df_fullsum[dd.EngEng['idCounty']
+    #                 ] = vacc_sums_nonsanit[dd.EngEng['idCounty']].unique()
+    # df_fullsum[unique_age_groups_old] = np.array(
+    #     vacc_sums_nonsanit[column_names_new[1]]).reshape(
+    #     len(vacc_sums_nonsanit[dd.EngEng['idCounty']].unique()),
+    #     len(unique_age_groups_old))
+    # # compute county and age-group-specific vaccination ratios
+    # df_fullsum[['r'+age for age in unique_age_groups_old] ] = df_fullsum[unique_age_groups_old] / geoger.merge_df_counties_all(
+    #     population_old_ages, sorting=[dd.EngEng["idCounty"]], columns=dd.EngEng["idCounty"])[unique_age_groups_old].values
     ### end of the be removed ###
 
     # store data   
@@ -818,9 +814,9 @@ def get_vaccination_data(read_data=dd.defaultDict['read_data'],
                 df_local_new.copy())
 
     # check for now, to be removed for production...
-    for id in geoger.get_county_ids():
-        if abs(df_data_ageinf_county_cs[df_data_ageinf_county_cs.ID_County==1001].groupby(['Date']).sum()-df_data_agevacc_county_cs[df_data_agevacc_county_cs.ID_County==1001].groupby(['Date']).sum()[column_names_new]).max().max() > 1e-8:
-            print('Error in ' + str(id))
+    # for id in geoger.get_county_ids():
+    #     if abs(df_data_ageinf_county_cs[df_data_ageinf_county_cs.ID_County==1001].groupby(['Date']).sum()-df_data_agevacc_county_cs[df_data_agevacc_county_cs.ID_County==1001].groupby(['Date']).sum()[column_names_new]).max().max() > 1e-8:
+    #         print('Error in ' + str(id))
     ### end of to be removed ###
 
     filename = 'all_county_ageinf_vacc'
