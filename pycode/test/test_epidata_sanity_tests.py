@@ -21,7 +21,7 @@ import unittest
 from epidemiology.epidata import getDIVIData as gdd
 from epidemiology.epidata import getCommuterMobility as cm
 from epidemiology.epidata import defaultDict as dd
-from datetime import timedelta, date
+from datetime import datetime, timedelta, date
 from epidemiology.epidata import getPopulationData as gpd
 
 # The following lines are commented to remember a solution to write an output without using the function print()
@@ -33,13 +33,16 @@ from epidemiology.epidata import getPopulationData as gpd
 class Test_Divi_SanityChecks(unittest.TestCase):
 
     # all test in this class fail if the test runs before 12:15. 
-    # if you want to test before 12:15 you need to add "- timedelta(1)" after date.today() in setUp(self)
-    
-    def setUp(self):
+    time = datetime.now().strftime('%H')
+    if int(time) < 13:
+        today = date.today() - timedelta(days=1)
+    else:
+        today = date.today()
+    last_number = 6072
+    [_, df, _] = gdd.download_data_for_one_day(last_number, today)
+    #def setUp(self):
         # get current Header 
-        self.today = date.today() - timedelta(1)
-        self.last_number = 6072
-        [_, self.df, _] = gdd.download_data_for_one_day(self.last_number, self.today)
+        
 
     def test_header_names(self):
         # These strings need to be in the header 
