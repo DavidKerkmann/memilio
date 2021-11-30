@@ -17,6 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
+
 from pyfakefs import fake_filesystem_unittest
 from unittest.mock import patch
 import unittest
@@ -242,10 +243,13 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
         mock_print.assert_any_call('Error. Number of government regions wrong.')
 
         mock_print.call_args_list = []
-        cm.verify_sorted(countykey_list=pd.Series(['01001', '01053', '02000', '03101', '06632', '04012', '05112',
-                                                   '05316', '06532', '07141']))
-        mock_print.assert_any_call('Error. Input list not sorted, population per county list had to be sorted '
-                                   'accordingly.')
+        cm.verify_sorted(
+            countykey_list=pd.Series(
+                ['01001', '01053', '02000', '03101', '06632', '04012', '05112',
+                 '05316', '06532', '07141']))
+        mock_print.assert_any_call(
+            'Error. Input list not sorted, population per county list had to be sorted '
+            'accordingly.')
 
         mock_print.call_args_list = []
         self.setup_dict['num_counties'] = 21

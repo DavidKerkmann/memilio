@@ -48,7 +48,7 @@ import os
 import sys
 import bisect
 from datetime import timedelta, date
-import pandas
+import pandas as pd
 
 from epidemiology.epidata import getDataIntoPandasDataFrame as gd
 from epidemiology.epidata import defaultDict as dd
@@ -123,10 +123,10 @@ def call_call_url(url_prefix, call_number):
                + str(call_number) + "/divi-intensivregister-" + url_prefix
 
     # empty data frame
-    df = pandas.DataFrame()
+    df = pd.DataFrame()
 
     try:
-        df = pandas.read_csv(call_url)
+        df = pd.read_csv(call_url)
     except:
         pass
 
@@ -332,7 +332,14 @@ def download_data_for_one_day(last_number, download_date):
                         date(2021, 10, 28): 6057,
                         date(2021, 10, 29): 6061,
                         date(2021, 10, 30): 6064,
-                        date(2021, 10, 31): 6068
+                        date(2021, 10, 31): 6068,
+                        date(2021, 11, 6): 6080,
+                        date(2021, 11, 17): 6175,
+                        date(2021, 11, 19): 6183,
+                        date(2021, 11, 20): 6207,
+                        date(2021, 11, 23): 6213,
+                        date(2021, 11, 24): 6216,
+                        date(2021, 11, 25): 6219,
                         }
     # TODO: 1. Is there any way to do better than this list?
     #       2. What about updates of the files the same day?
@@ -486,7 +493,7 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
         file_in = os.path.join(directory, filename + ".json")
 
         try:
-            df = pandas.read_json(file_in)
+            df = pd.read_json(file_in)
         except ValueError:
             exit_string = "Error: The file: " + file_in + " does not exist. "\
                           "Call program without -r or -u flag to get it."
@@ -500,7 +507,7 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
             if not df.empty:
                 # TODO: This has to be corrected! daten_stand does not exist anymore from October 29
                 # adjust_data would correct this too late. see below.
-                newest_date = pandas.to_datetime(
+                newest_date = pd.to_datetime(
                     df['daten_stand']).max().date()
 
                 if (today - delta) == newest_date:
@@ -512,9 +519,8 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
 
                     if not df2.empty:
                         # test if online data is already the one of today
-                        download_date = pandas.to_datetime(
+                        download_date = pd.to_datetime(
                             df2['daten_stand']).max().date()
-
                         if download_date == today:
                             # if (today <= date(2021, 3, 30)) or (today >= date(2021, 10, 29)):
                             df2 = adjust_data(df2, start_date)
@@ -534,14 +540,14 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     else:
         # Get all data:
         # start with empty dataframe
-        df = pandas.DataFrame()
+        df = pd.DataFrame()
 
-    last_number = 6072
+    last_number = 6219
 
     new_dict_string = ""
-    date_considered = date(2021, 11, 3)
+    date_considered = start_date        #date(2021, 11, 3)
     date_download = date_considered
-    while date_considered <= today:
+    while date_considered <= end_date:  #today:
 
         [last_number, df2, new_string] = download_data_for_one_day(
             last_number, date_considered)
@@ -583,7 +589,7 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     # change column names
     df.rename(dd.GerEng, axis=1, inplace=True)
 
-    df.Date = pandas.to_datetime(df.Date, format='%Y-%m-%d %H:%M')
+    df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d %H:%M:%S')
 
     # insert names of  states
     df.insert(loc=0, column=dd.EngEng["idState"], value=df[dd.EngEng["state"]])

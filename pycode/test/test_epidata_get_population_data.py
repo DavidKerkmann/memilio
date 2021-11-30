@@ -121,8 +121,8 @@ class Test_getPopulationData(fake_filesystem_unittest.TestCase):
     data = np.zeros((5, len(columns)))
     for i in range(len(data)):
         data[i, 0] = 1001 + i
-        data[i, 1] = 22*(i+1)
-        data[i, 2:] = 2*(i+1)
+        data[i, 1] = 2*22*(i+1)
+        data[i, 2:] = 2*2*(i+1)
     test_population_result = pd.DataFrame(data, columns=columns)
     test_population_result = test_population_result.astype('int64')
 
