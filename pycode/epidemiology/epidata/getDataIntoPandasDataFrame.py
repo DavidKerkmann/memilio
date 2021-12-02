@@ -154,7 +154,6 @@ def cli(what):
     - split_berlin
     - moving-average
     - start_date
-    - update
 
     @param what Defines what packages calls and thus what kind of command line arguments should be defined.
     """
@@ -163,10 +162,9 @@ def cli(what):
     # TODO: all should automatically do everything
     # cli_dict2 = {"end_date": ['divi'],
     #                "plot": ['rki'],
-    #                "start_date": ['divi'],
-    #                "update": ['divi']                 }
+    #                "start_date": ['divi']                 }
 
-    cli_dict = {"divi": ['Downloads data from DIVI', 'start_date', 'end_date', 'update', 'impute_dates', 'moving_average'],
+    cli_dict = {"divi": ['Downloads data from DIVI', 'start_date', 'end_date', 'impute_dates', 'moving_average'],
                 "rki": ['Download data from RKI', 'impute_dates', 'make_plot', 'moving_average', 'split_berlin', 'rep_date'],
                 "rkiest": ['Download data from RKI and JHU and estimate recovered and deaths', 'make_plot'],
                 "population": ['Download population data from official sources'],
@@ -174,7 +172,7 @@ def cli(what):
                 "vaccination": ['Download vaccination data', 'start_date', 'end_date', 'make_plot', 'moving_average'],
                 "testing": ['Download testing data', 'start_date', 'end_date', 'make_plot', 'moving_average'],
                 "jh" : ['Downloads data from Johns Hopkins University'],
-                "sim": ['Download all data needed for simulations', 'start_date', 'end_date', 'update',
+                "sim": ['Download all data needed for simulations', 'start_date', 'end_date',
                         'impute_dates', 'make_plot', 'moving_average', 'split_berlin']}
 
     try:
@@ -239,11 +237,6 @@ def cli(what):
                             type=lambda s: datetime.datetime.strptime(
                                 s, '%Y-%m-%d').date(),
                             default=dd.defaultDict['start_date'])
-    if 'update' in what_list:
-        group.add_argument('-u', '--update-data',
-                           help='Reads the data from file "json", downloads and adds data from today.',
-                           action='store_true')
-
     args = parser.parse_args()
 
     return vars(args)
