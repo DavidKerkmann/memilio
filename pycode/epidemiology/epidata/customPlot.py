@@ -18,7 +18,7 @@
 # limitations under the License.
 #############################################################################
 """
-@file customPlot.py
+@file customPlot.py c
 @brief Plots time series data as provided by the scripts.
 """
 import matplotlib.pyplot as plt 

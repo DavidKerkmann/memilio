@@ -19,6 +19,7 @@
 #############################################################################
 import os
 import pandas as pd
+import numpy as np
 
 import getDataIntoPandasDataFrame as gd
 import defaultDict as dd
@@ -40,9 +41,16 @@ def transformTwitterData(file_format=dd.defaultDict['file_format'],
 
     directory = out_folder
     directory = os.path.join(directory, 'mobility/')
+    directory = directory.replace('memilio', 'memilio-103-test')
 
     twitter = pd.read_csv(
         directory + 'twitter_scaled_1252.txt', sep=' ', header=None)
+
+    counties_n = geoger.get_stateid_to_countyids_map()[3]
+    indices = np.array([geoger.get_county_ids().index(i) for i in counties_n])
+    df_n = df_commuter_migration.iloc[indices,indices]
+    twitter = pd.read_csv(
+        directory + 'twitter_scaled_1252_03.txt', sep=' ', header=None)
 
     if len(twitter == 401):
         twitter.to_csv(

@@ -412,6 +412,16 @@ def get_commuter_data(setup_dict='',
     df_commuter_migration.to_csv(directory.split('pydata')[
                                  0] + 'mobility/commuter_migration_scaled' + '_20' + files[0].split('-20')[1][0:2] + '.txt', sep=' ', index=False, header=False)
 
+
+    directory = directory.replace('memilio', 'memilio-103-test')
+
+    counties_n = geoger.get_stateid_to_countyids_map()[3]
+    indices = np.array([geoger.get_county_ids().index(i) for i in counties_n])
+    df_n = df_commuter_migration.iloc[indices,indices]
+
+    df_n.to_csv(directory.split('pydata')[
+                                 0] + 'mobility/commuter_migration_scaled' + '_20' + files[0].split('-20')[1][0:2] + '_03.txt', sep=' ', index=False, header=False)    
+
     return df_commuter_migration
 
 
