@@ -31,7 +31,7 @@ from epidemiology.epidata import getPopulationData
 from epidemiology.epidata import modifyDataframeSeries
 from epidemiology.epidata import customPlot
 from epidemiology.epidata import geoModificationGermany as geoger
-from epidemiology.epidata import getCommuterMobility as coMobi
+from epidemiology.epidata import getCommuterMobility as gcm
 
 # Downloads vaccination data from RKI
 
@@ -499,9 +499,10 @@ def get_vaccination_data(read_data=dd.defaultDict['read_data'],
 
         # get neighbors based on mobility pattern and store
         # commuter inflow from other counties as first weight to distribute
-        # vaccinations from vaccination county to extrapolated home counties
-        neighbors_mobility = coMobi.get_neighbors_mobility_all(
-            direction='in', abs_tol=10, merge_eisenach=False, directory=directory)
+        # vaccinations from vaccination county to extrapolated home counties 
+        neighbors_mobility = gcm.get_neighbors_mobility_all(
+            direction='in', abs_tol=10, merge_eisenach=False, 
+            directory=directory)
 
         end_time = time.perf_counter()
         print("Time needed for preparing sanitizing: " +

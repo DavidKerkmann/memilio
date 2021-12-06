@@ -85,9 +85,6 @@ class Test_modifyDataframeSeries(fake_filesystem_unittest.TestCase):
             start_w_firstval=False)
         pd_testing.assert_frame_equal(test_df_new, self.test_df3)
 
-    def test_some_errors(self):
-        1
-
 
 if __name__ == '__main__':
     unittest.main()

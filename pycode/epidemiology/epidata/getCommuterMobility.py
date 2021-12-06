@@ -36,11 +36,18 @@ def verify_sorted(countykey_list):
     """! verify that read countykey_list is sorted
     @param countykey_list List of county regional keys
     """
+    if countykey_list == ():
+        print("Error. Can't sort empty lists.")
+        return False
+    else:
     # np.unique() does the sorting
-    countykey_list_unique = np.unique(np.array(countykey_list).astype(int))
-    if abs(countykey_list_unique-np.array(countykey_list).astype(int)).max() > 0:
-        print('Error. Input list not sorted, population per county list had to '
-              'be sorted accordingly.')
+        countykey_list_unique = np.unique(np.array(countykey_list).astype(int))
+        if abs(countykey_list_unique-np.array(countykey_list).astype(int)).max() > 0:
+            print('Error. Input list not sorted, population per county list had to '
+                  'be sorted accordingly.')
+            return False
+        else:
+            return True
 
 
 def assign_geographical_entities(countykey_list, govkey_list):
@@ -59,7 +66,9 @@ def assign_geographical_entities(countykey_list, govkey_list):
     @return state_gov_table Table of governing region regional keys per federal state.
     """
 
-    verify_sorted(countykey_list)
+    if verify_sorted(countykey_list) == False:
+        exit_string = "Error. Input list not sorted."
+        sys.exit(exit_string)
 
     # Create list of government regions with lists of counties that belong to them and list of states with government
     # regions that belong to them; only works with sorted lists of keys.
@@ -527,8 +536,7 @@ def main():
                   'rel_tol': rel_tol,
                   'path': path}
 
-
-    get_neighbors_mobility(1001, abs_tol=0, rel_tol=0, tol_comb='or')
+    get_neighbors_mobility(1001, abs_tol=0, rel_tol=0, tol_comb='or', merge_eisenach=True, directory='data/pydata/Germany')
 
     mat_commuter_migration = get_commuter_data(setup_dict, **arg_dict)
 

@@ -19,7 +19,7 @@
 #############################################################################
 import unittest
 from epidemiology.epidata import getDIVIData as gdd
-from epidemiology.epidata import getCommuterMobility as cm
+from epidemiology.epidata import getCommuterMobility as gcm
 from epidemiology.epidata import defaultDict as dd
 from datetime import datetime, timedelta, date
 from epidemiology.epidata import getPopulationData as gpd
@@ -102,7 +102,7 @@ class Test_Commuter_SanityChecks(unittest.TestCase):
     
     def setUp(self):
         # is there any way to do this faster?
-        self.df_commuter_migration = cm.get_commuter_data(
+        self.df_commuter_migration = gcm.get_commuter_data(
             setup_dict='', read_data=dd.defaultDict['read_data'],
             file_format=dd.defaultDict['file_format'],
             out_folder=dd.defaultDict['out_folder'],
