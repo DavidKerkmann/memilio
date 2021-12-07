@@ -1,7 +1,7 @@
 #############################################################################
 # Copyright (C) 2020-2021 German Aerospace Center (DLR-SC)
 #
-# Authors: 
+# Authors:
 #
 # Contact: Martin J. Kuehn <Martin.Kuehn@DLR.de>
 #
@@ -36,6 +36,7 @@ from epidemiology.epidata import getDIVIData
 from epidemiology.epidata import getRKIDatawithEstimations
 from epidemiology.epidata import getJHData
 
+
 class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
 
     path = '/home/x/'
@@ -65,8 +66,8 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         with self.assertRaises(SystemExit) as cm:
             gd.loadGeojson("targetFileName")
 
-        exit_string = "ERROR: URL " + 'https://opendata.arcgis.com/datasets/' + "targetFileName" + '.geojson' +\
-                      " could not be opened."
+        exit_string = "ERROR: URL " + 'https://opendata.arcgis.com/datasets/' + \
+            "targetFileName" + '.geojson' + " could not be opened."
 
         self.assertEqual(cm.exception.code, exit_string)
 
@@ -77,9 +78,9 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
 
         with self.assertRaises(SystemExit) as cm:
             gd.loadExcel("targetFileName")
-        
-        exit_string = "ERROR: URL " + 'https://opendata.arcgis.com/datasets/' + "targetFileName" + '.xls' +\
-                      " could not be opened."
+
+        exit_string = "ERROR: URL " + 'https://opendata.arcgis.com/datasets/' + \
+            "targetFileName" + '.xls' + " could not be opened."
 
         self.assertEqual(cm.exception.code, exit_string)
 
@@ -89,14 +90,22 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         mock_csv.return_value = pd.DataFrame()
 
         df_test = gd.loadCsv("targetFileName")
-        expected_call = [call('https://opendata.arcgis.com/datasets/' + "targetFileName" + '.csv')]
+        expected_call = [
+            call(
+                'https://opendata.arcgis.com/datasets/' +
+                "targetFileName" + '.csv')]
         mock_csv.assert_has_calls(expected_call)
 
         assert df_test.empty
 
-        df_test = gd.loadCsv("targetFileName", apiUrl='https://opendata.arcgis.com/datasets/different/',
-                             extension='.notcsv')
-        expected_call = [call('https://opendata.arcgis.com/datasets/different/' + "targetFileName" + '.notcsv')]
+        df_test = gd.loadCsv(
+            "targetFileName",
+            apiUrl='https://opendata.arcgis.com/datasets/different/',
+            extension='.notcsv')
+        expected_call = [
+            call(
+                'https://opendata.arcgis.com/datasets/different/' +
+                "targetFileName" + '.notcsv')]
         mock_csv.assert_has_calls(expected_call)
 
         assert df_test.empty
@@ -108,29 +117,30 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         with self.assertRaises(SystemExit) as cm:
             gd.loadCsv("targetFileName")
 
-        exit_string = "ERROR: URL " + 'https://opendata.arcgis.com/datasets/' + "targetFileName" + '.csv' + \
-                      " could not be opened."
+        exit_string = "ERROR: URL " + 'https://opendata.arcgis.com/datasets/' + \
+            "targetFileName" + '.csv' + " could not be opened."
 
         self.assertEqual(cm.exception.code, exit_string)
 
     def test_cli_correct_default(self):
         
         out_path_default = dd.defaultDict['out_folder']
+        
         arg_dict = gd.cli("population")
-        [read_data, file_format, out_folder, no_raw] = [ 
+        [read_data, file_format, out_folder, no_raw] = [
             arg_dict["read_data"],
-            arg_dict["file_format"], 
-            arg_dict["out_folder"], 
+            arg_dict["file_format"],
+            arg_dict["out_folder"],
             arg_dict["no_raw"]]
 
         assert read_data == dd.defaultDict['read_data']
         assert file_format == dd.defaultDict['file_format']
         assert out_folder == out_path_default
         assert no_raw == dd.defaultDict['no_raw']
-
+        
         arg_dict = gd.cli("jh")
-        [read_data, file_format, out_folder, no_raw] = [arg_dict["read_data"], arg_dict["file_format"],
-                                                        arg_dict["out_folder"], arg_dict["no_raw"]]
+        [read_data, file_format, out_folder, no_raw] = [arg_dict["read_data"],
+                                                        arg_dict["file_format"], arg_dict["out_folder"], arg_dict["no_raw"]]
 
         assert read_data == dd.defaultDict['read_data']
         assert file_format == dd.defaultDict['file_format']
@@ -177,23 +187,22 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         arg_dict = gd.cli("commuter_official")
         [read_data, file_format, out_folder, no_raw] = [
             arg_dict["read_data"],
-            arg_dict["file_format"], 
-            arg_dict["out_folder"], 
+            arg_dict["file_format"],
+            arg_dict["out_folder"],
             arg_dict["no_raw"]]
-        
+
         assert read_data == dd.defaultDict['read_data']
         assert file_format == dd.defaultDict['file_format']
         assert out_folder == out_path_default
         assert no_raw == dd.defaultDict['no_raw']
 
         arg_dict = gd.cli("divi")
-        [read_data, file_format, out_folder, end_date, start_date, update_data,
+        [read_data, file_format, out_folder, end_date, start_date,
          impute_dates, moving_average, no_raw] = [arg_dict["read_data"],
                                                   arg_dict["file_format"],
                                                   arg_dict["out_folder"],
                                                   arg_dict["end_date"],
                                                   arg_dict["start_date"],
-                                                  arg_dict["update_data"],
                                                   arg_dict["impute_dates"],
                                                   arg_dict["moving_average"],
                                                   arg_dict["no_raw"]]
@@ -203,14 +212,13 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         assert out_folder == out_path_default
         assert end_date == dd.defaultDict['end_date']
         assert start_date == dd.defaultDict['start_date']
-        assert update_data == dd.defaultDict['update_data']
         assert impute_dates == dd.defaultDict['impute_dates']
         assert moving_average == dd.defaultDict['moving_average']
         assert no_raw == dd.defaultDict['no_raw']
 
         arg_dict = gd.cli("sim")
         [read_data, file_format, out_folder, end_date, make_plot, impute_dates,
-         moving_average, split_berlin, start_date, update_data, no_raw] = [
+         moving_average, split_berlin, start_date, no_raw] = [
             arg_dict["read_data"],
             arg_dict["file_format"],
             arg_dict["out_folder"],
@@ -220,7 +228,6 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
             arg_dict["moving_average"],
             arg_dict["split_berlin"],
             arg_dict["start_date"],
-            arg_dict["update_data"],
             arg_dict["no_raw"]]
 
         assert read_data == dd.defaultDict['read_data']
@@ -233,8 +240,6 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         assert moving_average == dd.defaultDict['moving_average']
         assert split_berlin == dd.defaultDict['split_berlin']
         assert start_date == dd.defaultDict['start_date']
-        assert update_data == dd.defaultDict['update_data']
-
 
     @patch('sys.stderr', new_callable=StringIO)
     def test_cli_correct_raise_exit(self, mock_stderr):
@@ -252,46 +257,37 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
                 gd.cli("rki")
             self.assertRegexpMatches(mock_stderr.getvalue(), r"invalid choice")
 
-        # update_data and read_data together does not work
-        test_args = ["prog", '-r', '-u']
-        with patch.object(sys, 'argv', test_args):
-            with self.assertRaises(SystemExit) as cm:
-                gd.cli("divi")
-            self.assertRegexpMatches(mock_stderr.getvalue(),
-                                     r"argument -u/--update-data: not allowed with argument -r/--read-data")
-
-
-        test_args = ["prog", '-u', '-r']
-        with patch.object(sys, 'argv', test_args):
-            with self.assertRaises(SystemExit) as cm:
-                gd.cli("sim")
-
-            self.assertRegexpMatches(mock_stderr.getvalue(),
-                                     r"argument -r/--read-data: not allowed with argument -u/--update-data")
-
-        test_args = ["prog", '--update-data',]
+        test_args = ["prog", '--update-data', ]
         with patch.object(sys, 'argv', test_args):
             with self.assertRaises(SystemExit) as cm:
                 gd.cli("rki")
-            self.assertRegexpMatches(mock_stderr.getvalue(), r"unrecognized arguments")
+            self.assertRegexpMatches(
+                mock_stderr.getvalue(),
+                r"unrecognized arguments")
 
         test_args = ["prog", '--start_date']
         with patch.object(sys, 'argv', test_args):
             with self.assertRaises(SystemExit) as cm:
                 gd.cli("rki")
-            self.assertRegexpMatches(mock_stderr.getvalue(), r"unrecognized arguments")
+            self.assertRegexpMatches(
+                mock_stderr.getvalue(),
+                r"unrecognized arguments")
 
         test_args = ["prog", '--end_date']
         with patch.object(sys, 'argv', test_args):
             with self.assertRaises(SystemExit) as cm:
                 gd.cli("rki")
-            self.assertRegexpMatches(mock_stderr.getvalue(), r"unrecognized arguments")
+            self.assertRegexpMatches(
+                mock_stderr.getvalue(),
+                r"unrecognized arguments")
 
         test_args = ["prog", '--make-plot']
         with patch.object(sys, 'argv', test_args):
             with self.assertRaises(SystemExit) as cm:
                 gd.cli("divi")
-            self.assertRegexpMatches(mock_stderr.getvalue(), r"unrecognized arguments")
+            self.assertRegexpMatches(
+                mock_stderr.getvalue(),
+                r"unrecognized arguments")
 
         test_args = ["prog", '--start-date', '2020,3,24']
         with patch.object(sys, 'argv', test_args):
@@ -307,7 +303,8 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
 
         folder = "some_folder"
 
-        test_args = ["prog", '--read-data', '--out-folder', folder, '--file-format', 'hdf5', '--no-raw']
+        test_args = ["prog", '--read-data', '--out-folder',
+                     folder, '--file-format', 'hdf5', '--no-raw']
 
         with patch.object(sys, 'argv', test_args):
 
@@ -352,7 +349,7 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
                 arg_dict["split_berlin"],
                 arg_dict["no_raw"],
                 arg_dict["rep_date"]]
-            
+
             assert read_data == True
             assert file_format == 'hdf5'
             assert out_folder == "some_folder"
@@ -368,9 +365,12 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
 
         with patch.object(sys, 'argv', test_args):
             arg_dict = gd.cli("rkiest")
-            [read_data, file_format, out_folder, no_raw, make_plot] =\
-                [arg_dict["read_data"], arg_dict["file_format"], arg_dict["out_folder"],
-                 arg_dict["no_raw"], arg_dict["make_plot"]]
+            [read_data, file_format, out_folder, no_raw, make_plot] = [
+                arg_dict["read_data"],
+                arg_dict["file_format"],
+                arg_dict["out_folder"],
+                arg_dict["no_raw"],
+                arg_dict["make_plot"]]
 
             assert read_data == True
             assert file_format == 'json'
@@ -380,54 +380,50 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
 
         test_args = [
             "prog", '--out-folder', folder, '--file-format', 'json',
-            '--update-data', '--start-date', '2020-11-24', '--end-date',
-            '2020-11-26', '-n']
+            '--start-date', '2020-11-24', '--end-date', '2020-11-26', '-n']
 
         with patch.object(sys, 'argv', test_args):
             arg_dict = gd.cli("divi")
             [read_data, file_format, out_folder, end_date, start_date,
-             update_data, no_raw] = [arg_dict["read_data"],
-                arg_dict["file_format"],
-                arg_dict["out_folder"],
-                arg_dict["end_date"],
-                arg_dict["start_date"],
-                arg_dict["update_data"],
-                arg_dict["no_raw"]]
-
-            assert read_data == dd.defaultDict['read_data']
-            assert file_format == 'json'
-            assert out_folder == "some_folder"
-            assert end_date == date(2020,11,26)
-            assert start_date == date(2020,11,24)
-            assert no_raw == True
-
-        test_args = [
-            "prog", '--out-folder', folder, '--file-format', 'json',
-            '--update-data', '--make-plot', '--start-date', '2020-11-24',
-            '--end-date', '2020-11-26']
-
-        with patch.object(sys, 'argv', test_args):
-            arg_dict = gd.cli("sim")
-            [read_data, file_format, out_folder, no_raw, end_date,
-             impute_dates, make_plot, moving_average, split_berlin,
-             start_date, update_data] = [arg_dict["read_data"],
-                                         arg_dict["file_format"],
-                                         arg_dict["out_folder"],
-                                         arg_dict["no_raw"],
-                                         arg_dict["end_date"],
-                                         arg_dict["impute_dates"],
-                                         arg_dict["make_plot"],
-                                         arg_dict["moving_average"],
-                                         arg_dict["split_berlin"],
-                                         arg_dict["start_date"],
-                                         arg_dict["update_data"]]
+             no_raw] = [arg_dict["read_data"],
+                        arg_dict["file_format"],
+                        arg_dict["out_folder"],
+                        arg_dict["end_date"],
+                        arg_dict["start_date"],
+                        arg_dict["no_raw"]]
 
             assert read_data == dd.defaultDict['read_data']
             assert file_format == 'json'
             assert out_folder == "some_folder"
             assert end_date == date(2020, 11, 26)
             assert start_date == date(2020, 11, 24)
-            assert update_data == True
+            assert no_raw == True
+
+        test_args = [
+            "prog", '--out-folder', folder, '--file-format', 'json',
+            '--make-plot', '--start-date', '2020-11-24', '--end-date',
+            '2020-11-26']
+
+        with patch.object(sys, 'argv', test_args):
+            arg_dict = gd.cli("sim")
+            [read_data, file_format, out_folder, no_raw, end_date,
+             impute_dates, make_plot, moving_average, split_berlin,
+             start_date] = [arg_dict["read_data"],
+                            arg_dict["file_format"],
+                            arg_dict["out_folder"],
+                            arg_dict["no_raw"],
+                            arg_dict["end_date"],
+                            arg_dict["impute_dates"],
+                            arg_dict["make_plot"],
+                            arg_dict["moving_average"],
+                            arg_dict["split_berlin"],
+                            arg_dict["start_date"]]
+
+            assert read_data == dd.defaultDict['read_data']
+            assert file_format == 'json'
+            assert out_folder == "some_folder"
+            assert end_date == date(2020, 11, 26)
+            assert start_date == date(2020, 11, 24)
             assert make_plot == True
             assert split_berlin == dd.defaultDict['split_berlin']
             assert moving_average == dd.defaultDict['moving_average']
@@ -450,7 +446,7 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
             testfilename2, gd.append_filename(
                 "FileName", test_impute_dates, dd.defaultDict
                 ['moving_average']))
-        
+
         self.assertEqual(
             testfilename3, gd.append_filename(
                 "FileName", test_impute_dates, test_moving_average))
@@ -462,16 +458,18 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         gd.check_dir(self.path)
         self.assertTrue(os.path.exists(self.path))
 
-    test_string_json = ("""[{"Date":1606348800000,"col2":"d1"},{"Date":1595721600000,"col2":"d2"}]""")
-    test_string_json_timeasstring = ("""[{"Date":"2020-11-26","col2":"d1"},{"Date":"2020-07-26","col2":"d2"}]""")
+    test_string_json = (
+        """[{"Date":1606348800000,"col2":"d1"},{"Date":1595721600000,"col2":"d2"}]""")
+    test_string_json_timeasstring = (
+        """[{"Date":"2020-11-26","col2":"d1"},{"Date":"2020-07-26","col2":"d2"}]""")
 
     def test_write_dataframe(self):
 
         gd.check_dir(self.path)
 
-        d1 = date(2020,11,26)
+        d1 = date(2020, 11, 26)
         d1 = datetime.combine(d1, datetime.min.time())
-        d2 = date(2020,7,26)
+        d2 = date(2020, 7, 26)
         d2 = datetime.combine(d2, datetime.min.time())
 
         d = {'Date': [d1, d2], 'col2': ["d1", "d2"]}
@@ -489,14 +487,15 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
         fread = f.read()
         self.assertEqual(fread, self.test_string_json)
 
-        d1_in_sec = (d1- datetime(1970, 1, 1)).total_seconds()
+        d1_in_sec = (d1 - datetime(1970, 1, 1)).total_seconds()
         # date in milliseconds
         assert d1_in_sec*1000 == 1606348800000
 
         d2_in_sec = (d2 - datetime(1970, 1, 1)).total_seconds()
         assert d2_in_sec*1000 == 1595721600000
 
-        gd.write_dataframe(df, self.path, "test_json_timeasstring", 'json_timeasstring')
+        gd.write_dataframe(
+            df, self.path, "test_json_timeasstring", 'json_timeasstring')
 
         file2 = "test_json_timeasstring.json"
 
@@ -539,12 +538,15 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
     @patch('epidemiology.epidata.getVaccinationData.get_vaccination_data')
     @patch('epidemiology.epidata.getRKIDatawithEstimations.get_rki_data_with_estimations')
     @patch('epidemiology.epidata.getJHData.get_jh_data')
-    def test_call_functions(self, mock_jh, mock_rkiwe, mock_vaccination, mock_agep, mock_popul, mock_rki,
-                            mock_divi):
+    def test_call_functions(
+            self, mock_jh, mock_rkiwe, mock_vaccination, mock_agep, mock_popul,
+            mock_rki, mock_divi):
 
-        arg_dict_all = {"read_data": dd.defaultDict['read_data'], "file_format": dd.defaultDict['file_format'],
-                        "out_folder": os.path.join(dd.defaultDict['out_folder']),
-                        'no_raw': dd.defaultDict["no_raw"]}
+        arg_dict_all = {
+            "read_data": dd.defaultDict['read_data'],
+            "file_format": dd.defaultDict['file_format'],
+            "out_folder": os.path.join(dd.defaultDict['out_folder']),
+            'no_raw': dd.defaultDict["no_raw"]}
 
         arg_dict_vaccination = {
             **arg_dict_all,
@@ -553,7 +555,8 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
             "moving_average": dd.defaultDict['moving_average'],
             "start_date": dd.defaultDict['start_date']}
 
-        arg_dict_rki_est = {**arg_dict_all,  "make_plot": dd.defaultDict['make_plot']}
+        arg_dict_rki_est = {**arg_dict_all,
+                            "make_plot": dd.defaultDict['make_plot']}
 
         arg_dict_rki = {
             **arg_dict_all,
@@ -567,8 +570,7 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
             **arg_dict_all, "end_date": dd.defaultDict['end_date'],
             "impute_dates": dd.defaultDict['impute_dates'],
             "moving_average": dd.defaultDict['moving_average'],
-            "start_date": dd.defaultDict['start_date'],
-            "update_data": dd.defaultDict['update_data']}
+            "start_date": dd.defaultDict['start_date']}
 
         getVaccinationData.main()
         mock_vaccination.assert_called()

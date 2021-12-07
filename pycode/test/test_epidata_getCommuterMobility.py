@@ -65,15 +65,7 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
     
     (countykey2govkey, countykey2localnumlist, gov_county_table,
          state_gov_table) = gcm.assign_geographical_entities(countykey_list, govkey_list)
-
-    df_commuter_migration = pd.DataFrame({
-        '01001': [0, 14, '', '', '', ''],
-        '01053': [15, 0, '', '', '', ''],
-        '02000': ['', '', 0, '', '', ''], 
-        '05112': ['', '', '', 0, '', 11],
-        '06532': ['', '', '', '', 0, ''],
-        '12066': ['', '', '', 12, '', 0]},
-        index = ['01001', '01053', '02000', '05112', '06532', '12066'])
+    df_commuter_migration = gcm.get_commuter_data()
     mat_commuter_migration = df_commuter_migration.iloc[: , 0:]
     mat_commuter_migration = mat_commuter_migration.iloc[0: , :]
     
@@ -375,20 +367,35 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
         testcountyid = 1051
         tci = testcountyid
         #test case with empty directory
+        #direction = both
         (countykey_list, commuter_all) = gcm.get_neighbors_mobility(
             tci, direction='both', abs_tol=0, rel_tol=0,
             tol_comb='or', merge_eisenach=True, directory='')
-        expected_call = ("Commuter data was not found. Download and process it from the internet.")
-        mock_print.assert_has_calls(expected_call)
+        expected_call = "Commuter data was not found. Download and process it from the internet."
+        mock_gcd.assert_called_with(expected_call)
+        self.assertEqual(len(countykey_list), 398)
+        self.assertAlmostEqual(228, commuter_all[0], 2)
+        self.assertAlmostEqual(2146, commuter_all[9], 2)
+        self.assertAlmostEqual(293, commuter_all[11], 2)
+        self.assertAlmostEqual(1, commuter_all[397], 2)
 
+        # direction = in
         (countykey_list, commuter_all) = gcm.get_neighbors_mobility(
             tci, direction='in', abs_tol=0, rel_tol=0,
             tol_comb='or', merge_eisenach=True, directory='')
+        self.assertEqual(len(countykey_list), 393)
+        self.assertAlmostEqual(48, commuter_all[0], 2)
+        self.assertAlmostEqual(842, commuter_all[9], 2)
+        self.assertAlmostEqual(92, commuter_all[11], 2)
 
+        # direction = out
         (countykey_list, commuter_all) = gcm.get_neighbors_mobility(
             tci, direction='out', abs_tol=0, rel_tol=0,
             tol_comb='or', merge_eisenach=True, directory='')
-        
+        self.assertEqual(len(countykey_list), 375)
+        self.assertAlmostEqual(180, commuter_all[0], 2)
+        self.assertAlmostEqual(1304, commuter_all[9], 2)
+        self.assertAlmostEqual(201, commuter_all[11], 2)
 
 
 

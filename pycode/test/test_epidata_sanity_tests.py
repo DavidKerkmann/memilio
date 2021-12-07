@@ -32,17 +32,10 @@ from epidemiology.epidata import getPopulationData as gpd
 
 class Test_Divi_SanityChecks(unittest.TestCase):
 
-    # all test in this class fail if the test runs before 12:15. 
-    time = datetime.now().strftime('%H')
-    if int(time) < 13:
-        today = date.today() - timedelta(days=1)
-    else:
-        today = date.today()
-    last_number = 6072
-    [_, df, _] = gdd.download_data_for_one_day(last_number, today)
     #def setUp(self):
         # get current Header 
-        
+    (df, df_counties, df_states, df_ger) = gdd.get_divi_data(read_data=False)   
+    today = date.today()
 
     def test_header_names(self):
         # These strings need to be in the header 
@@ -112,11 +105,12 @@ class Test_Commuter_SanityChecks(unittest.TestCase):
     def test_data_size(self):
         self.assertEqual(len(self.df_commuter_migration.index),
                          len(self.df_commuter_migration.columns))
-        assert len(self.df_commuter_migration.index) > 0
+        assert len(self.df_commuter_migration.index) > 40
         assert len(self.df_commuter_migration.index) < 500
 
     # check if diagonal elements =0 ?
-'''class Test_PopulationData_SanityChecks(unittest.TestCase):
+    '''
+    class Test_PopulationData_SanityChecks(unittest.TestCase):
     
     def setUp(self):
         self.df = gpd.get_population_data()
@@ -134,6 +128,6 @@ class Test_Commuter_SanityChecks(unittest.TestCase):
         for name in test_strings:
             if(name not in actual_strings_list):
                 self.assertFalse("Not the same headers anymore!")
-'''
+    '''
 if __name__ == '__main__':
     unittest.main()

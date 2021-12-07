@@ -47,13 +47,31 @@ ICU_ventilated does not exist for the 24.4. and 25.4.
 import os
 import sys
 import bisect
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 import pandas as pd
 
 from epidemiology.epidata import getDataIntoPandasDataFrame as gd
 from epidemiology.epidata import defaultDict as dd
 from epidemiology.epidata import geoModificationGermany as geoger
 from epidemiology.epidata import modifyDataframeSeries
+
+def cut_of_dates(df, start_date, end_date):
+
+    startdelta = (start_date - dd.defaultDict['start_date']).days
+    enddelta = (dd.defaultDict['end_date'] - end_date).days
+    for i in range (startdelta):
+        lowest_date = dd.defaultDict['start_date'] + timedelta(i)
+        dt = lowest_date
+        df_new = df[df.Date != datetime.strftime(dt, '%Y-%m-%d')]
+        df = df_new
+    for i in range (enddelta):
+        highest_date = dd.defaultDict['end_date'] - timedelta(i)
+        dt = highest_date
+        df_new = df[df.Date != datetime.strftime(dt, '%Y-%m-%d')]
+        df = df_new
+    df.reset_index(drop=True, inplace=True)
+
+    return df
 
 def get_divi_data(read_data=dd.defaultDict['read_data'],
                   file_format=dd.defaultDict['file_format'],
@@ -73,15 +91,7 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     and stored in a pandas dataframe.
     Otherwise the program is stopped.
 
-        If data should normally be downloaded between start_date and end_date, we start with an empty pandas dataframe.
-        Afterwards, for every day between start_date and end_date, both included,
-        the function download_data_for_one_day is called.
-        If a given back dataframe is empty, a warning is printed that this date is missing, but the program is not stopped.
-        If start_date is earlier or equal 2020-04-29, the function adjust_data has to be called.
-        If data has been downloaded, the dataframe of this one date is added to the dataframe with all dates.
-
-    If the dataframe which should contain all data is empty after going through all dates, the program is stopped.
-    Otherwise the dataframe is written to the file filename = "FullData_DIVI".
+    The dataframe is written to the file filename = "FullData_DIVI".
     Than the columns are renamed to English and the state and county names are added.
     Afterwards, three kinds of structuring of the data are done.
     We obtain the chronological sequence of ICU and ICU_ventilated
@@ -93,8 +103,8 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     "False [Default]" if it is downloaded for all dates from start_date to end_date.
     @param out_folder Folder where data is written to.
     @param no_raw True or False [Default]. Defines if unchanged raw data is saved or not.
-    @param start_date [Optional] Date to start to download data [Default = 2020.4.24].
-    @param end_date [Optional] Date to stop to download data [Default = today].
+    @param start_date [Optional] Date of first data in dataframe[Default = 2020.4.24].
+    @param end_date [Optional] Date to last data in dataframe [Default = today].
     @param impute_dates True or False [Default]. Defines if values for dates without new information are imputed.
     @param moving_average 0 [Default] or >0. Applies an 'moving_average'-days moving average on all time series
         to smooth out weekend effects.
@@ -124,7 +134,6 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     else:
         try:
             df = gd.loadCsv('zeitreihe-tagesdaten',apiUrl='https://diviexchange.blob.core.windows.net/%24web/', extension='.csv')
-            df.rename(columns={'date': dd.EngEng['date']}, inplace=True)
         except:
             exit_string = "Error: Download link for Divi data has changed."
             sys.exit(exit_string)
@@ -135,10 +144,12 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     else:
         exit_string = "Something went wrong, dataframe is empty."
         sys.exit(exit_string)
-
+    df_raw = df.copy()
+    df.rename(columns={'date': dd.EngEng['date']}, inplace=True)
     df.rename(dd.GerEng, axis=1, inplace=True)
 
     df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d %H:%M:%S')
+    df = cut_of_dates(df, start_date, end_date)
 
     # insert names of  states
     df.insert(loc=0, column=dd.EngEng["idState"], value=df[dd.EngEng["state"]])
@@ -208,6 +219,8 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     filename = "germany_divi"
     filename = gd.append_filename(filename, impute_dates, moving_average)
     gd.write_dataframe(df_ger, directory, filename, file_format)
+
+    return(df_raw, df_counties, df_states, df_ger)
 
 
 def main():
