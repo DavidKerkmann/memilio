@@ -55,16 +55,17 @@ from epidemiology.epidata import defaultDict as dd
 from epidemiology.epidata import geoModificationGermany as geoger
 from epidemiology.epidata import modifyDataframeSeries
 
+
 def cut_of_dates(df, start_date, end_date):
 
     startdelta = (start_date - dd.defaultDict['start_date']).days
     enddelta = (dd.defaultDict['end_date'] - end_date).days
-    for i in range (startdelta):
+    for i in range(startdelta):
         lowest_date = dd.defaultDict['start_date'] + timedelta(i)
         dt = lowest_date
         df_new = df[df.Date != datetime.strftime(dt, '%Y-%m-%d')]
         df = df_new
-    for i in range (enddelta):
+    for i in range(enddelta):
         highest_date = dd.defaultDict['end_date'] - timedelta(i)
         dt = highest_date
         df_new = df[df.Date != datetime.strftime(dt, '%Y-%m-%d')]
@@ -72,6 +73,7 @@ def cut_of_dates(df, start_date, end_date):
     df.reset_index(drop=True, inplace=True)
 
     return df
+
 
 def get_divi_data(read_data=dd.defaultDict['read_data'],
                   file_format=dd.defaultDict['file_format'],
@@ -133,7 +135,10 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
             sys.exit(exit_string)
     else:
         try:
-            df = gd.loadCsv('zeitreihe-tagesdaten',apiUrl='https://diviexchange.blob.core.windows.net/%24web/', extension='.csv')
+            df = gd.loadCsv(
+                'zeitreihe-tagesdaten',
+                apiUrl='https://diviexchange.blob.core.windows.net/%24web/',
+                extension='.csv')
         except:
             exit_string = "Error: Download link for Divi data has changed."
             sys.exit(exit_string)
@@ -145,6 +150,7 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
         exit_string = "Something went wrong, dataframe is empty."
         sys.exit(exit_string)
     df_raw = df.copy()
+    gdd_sanity_checks(df_raw)
     df.rename(columns={'date': dd.EngEng['date']}, inplace=True)
     df.rename(dd.GerEng, axis=1, inplace=True)
 
@@ -181,8 +187,11 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     countyid_to_stateid = geoger.get_countyid_to_stateid_map()
     for id in df.loc[df.isnull().any(axis=1), dd.EngEng['idCounty']].unique():
         stateid = countyid_to_stateid[id]
-        df.loc[df[dd.EngEng['idCounty']] == id, [dd.EngEng['idState'], dd.EngEng['state'],
-                                                 dd.EngEng['county']]] = [stateid, stateid_to_name[stateid], countyid_to_name[id]]
+        df.loc[df[dd.EngEng['idCounty']] == id,
+               [dd.EngEng['idState'],
+                dd.EngEng['state'],
+                dd.EngEng['county']]] = [stateid, stateid_to_name[stateid],
+                                         countyid_to_name[id]]
 
     # write data for counties to file
     df_counties = df[[dd.EngEng["idCounty"],
@@ -221,6 +230,35 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     gd.write_dataframe(df_ger, directory, filename, file_format)
 
     return(df_raw, df_counties, df_states, df_ger)
+
+
+def gdd_sanity_checks(df = pd.DataFrame()):
+
+    # get actual headers
+    try:
+        actual_strings_list = df.columns.tolist()
+    except:
+        exit_string = "Error: no dataframe given."
+        sys.exit(exit_string)
+
+    if len(actual_strings_list) != 11:
+        exit_string = "Error: Number of data categories changed."
+        sys.exit(exit_string)
+
+    # These strings need to be in the header
+    test_strings = {
+        "date", "bundesland", "gemeindeschluessel", "faelle_covid_aktuell",
+        "faelle_covid_aktuell_invasiv_beatmet"}
+
+    # Compare
+    for name in test_strings:
+        if(name not in actual_strings_list):
+            exit_string = "Error: Data categories have changed."
+            sys.exit(exit_string)
+
+    if (len(df.index) < 200000) or (len(df.index) > 500000):
+        exit_string = "Error: unexpected length of dataframe."
+        sys.exit(exit_string)
 
 
 def main():

@@ -69,8 +69,8 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
     mat_commuter_migration = df_commuter_migration.iloc[: , 0:]
     mat_commuter_migration = mat_commuter_migration.iloc[0: , :]
     
-    #def setUp(self):
-    #    self.setUpPyfakefs()
+    def setUp(self):
+        self.setUpPyfakefs()
         
     def write_kreise_deu_data(self, out_folder):
         # sheet 0 is unused in commuter_migration_bfa, but other one has to have index 1
