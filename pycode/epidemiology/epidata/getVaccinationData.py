@@ -93,15 +93,16 @@ def create_intervals_mapping(from_lower_bounds, to_lower_bounds):
 
 
 def split_column_based_on_values(
-        df_global, column_ident, column_vals, new_column_labels):
-    """! Fills missing dates of df and optionally calculates the the 7 day moving average of the data
+        df_global, column_ident, column_vals_name, new_column_labels):
+    """! Fills missing dates of df 
 
     @param df_global global pandas dataframe
     @param column_ident identifier to split accordingly
-    @param column_vals values to be put in new columns
+    @param column_vals_name name of column values to be put in new columns
     @param new_column_labels new labels for resulting columns
-    @return dataframe with imputed dates (and moving average if requested)
+    @return dataframe with imputed dates
     """
+    #TODO: Maybe we should input a map e.g. 1->Vacc_partially, 2->Vacc_copleted etc. This is more future proof.
     # check number of given names and correct if necessary
     column_identifiers = df_global[column_ident].unique()
     if len(column_identifiers) != len(new_column_labels):
@@ -116,7 +117,7 @@ def split_column_based_on_values(
             df_global[df_global[column_ident] == column_identifiers[i]].copy())
         df_subset[i] = df_subset[i].drop(columns=column_ident)
         df_subset[i] = df_subset[i].rename(
-            columns={column_vals: new_column_labels[i]})
+            columns={column_vals_name: new_column_labels[i]})
 
     return df_subset
 
@@ -188,13 +189,13 @@ def get_vaccination_data(read_data=dd.defaultDict['read_data'],
     df_data.rename(dd.GerEng, axis=1, inplace=True)
 
     # remove unknown locations if only modest number
-    if df_data[df_data[dd.EngEng['idCounty']] == 'u'].agg({'Number': sum}).Number < 10000:
+    if df_data[df_data[dd.EngEng['idCounty']] == 'u'].agg({'Number': sum}).Number < 100000:
         df_data = df_data[df_data[dd.EngEng['idCounty']] != 'u']
     else:
         print('Too many data items with unknown vaccination location, '
               'please check source data.')
 
-    if df_data[df_data[dd.EngEng['ageRKI']] == 'u'].agg({'Number': sum}).Number < 10000:
+    if df_data[df_data[dd.EngEng['ageRKI']] == 'u'].agg({'Number': sum}).Number < 100000:
         df_data = df_data[df_data[dd.EngEng['ageRKI']] != 'u']
     else:
         print('Too many data items with unknown vaccination age, '

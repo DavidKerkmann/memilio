@@ -24,6 +24,7 @@ from freezegun import freeze_time
 from datetime import date, datetime, time, timedelta
 
 import os
+import io
 import pandas as pd
 
 from epidemiology.epidata import getDIVIData as gdd
@@ -116,7 +117,7 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
 
     @patch('builtins.print')
     @patch('epidemiology.epidata.getDataIntoPandasDataFrame.loadCsv', return_value = df_raw.copy())
-    def test_det_divi_data(self, mocklcsv, mock_print):
+    def test_det_divi_data_prints(self, mocklcsv, mock_print):
 
         # case with start_date before 2020-04-24
         gdd.get_divi_data(out_folder=self.path, start_date=date(2020, 1, 1))
