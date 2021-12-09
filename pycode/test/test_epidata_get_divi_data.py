@@ -24,6 +24,7 @@ from freezegun import freeze_time
 from datetime import date, datetime, time, timedelta
 
 import os
+import io
 import pandas as pd
 
 from epidemiology.epidata import getDIVIData as gdd
@@ -66,8 +67,8 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
             date(2021, 9, 8))
         pd.testing.assert_frame_equal(self.test_df, df_state_testdate)
 
-    @patch('builtins.print')
-    #@patch('epidemiology.epidata.getDIVIData.get_divi_data')
+    
+    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_det_divi_data(self, mock_print):
 
         # case with start_date before 2020-04-24 
@@ -81,8 +82,10 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         gdd.get_divi_data(
             read_data, file_format, out_folder, no_raw, end_date, start_date,
             impute_dates, moving_average)
-        expected_call = [('Warning: First data available on 2020-04-24. You asked for 2020-01-01.')]  
-        mock_print.assert_has_calls(expected_call)
+
+        expected_output = 'Warning: First data available on 2020-04-24. You asked for 2020-01-01.'
+        expected_in_actual_print = mock_print.getvalue()
+        self.assertTrue(expected_output.__contains__(expected_output))
 
         
 
