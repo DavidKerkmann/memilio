@@ -24,7 +24,6 @@ from freezegun import freeze_time
 from datetime import date, datetime, time, timedelta
 
 import os
-import io
 import pandas as pd
 
 from epidemiology.epidata import getDIVIData as gdd

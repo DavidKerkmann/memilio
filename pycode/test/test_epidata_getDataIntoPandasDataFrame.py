@@ -57,7 +57,7 @@ class Test_getDataIntoPandasDataFrame(fake_filesystem_unittest.TestCase):
 
     def setUp(self):
         self.setUpPyfakefs()
-        del sys.argv[1:] # In this unit tests parse_args is called and when unittests are called they have a lot of command lines which lead to errors.
+        del sys.argv[1:] # In this unit tests parse_args is called when it is called through unittests. This has a lot of command lines which lead to errors in getDataIntoPandasDataframe.
         # TODO:Is this is a good way to solve this?
 
     @patch('epidemiology.epidata.getDataIntoPandasDataFrame.urlopen')
