@@ -542,29 +542,17 @@ def get_divi_data(read_data=dd.defaultDict['read_data'],
     new_dict_string = ""
     date_considered = date(2021, 11, 3)
     date_download = date_considered
-    while date_considered <= today:
 
-        [last_number, df2, new_string] = download_data_for_one_day(
-            last_number, date_considered)
+    url = 'https://diviexchange.blob.core.windows.net/%24web/zeitreihe-tagesdaten.csv'
+    # empty data frame to return if not read correctly
+    df = pandas.DataFrame()
+    # try to read csv
+    try:
+        df = pandas.read_csv(url)
+    except:
+        print("Error in reading csv. Returning empty data frame.")    
 
-        if not df2.empty:
-
-            new_dict_string = new_dict_string + new_string
-
-            if len(df[df.isnull().any(axis=1)]) > 0:
-                print("Error. Empty values in DataFrame.")
-
-            df = df2.copy()
-            date_download = date_considered
-
-        else:
-            print("Warning: Data of date " +
-                  date_considered.strftime("%Y-%m-%d") + " was not found.")
-
-        date_considered += delta
-
-    print("Success: Data of date " +
-          date_download.strftime("%Y-%m-%d") + " was found.")
+    print("Success: Data was found.")
 
     # output data before renaming
     if not df.empty:
