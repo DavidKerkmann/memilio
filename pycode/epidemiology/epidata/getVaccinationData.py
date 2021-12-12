@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #############################################################################
-from datetime import date
+from datetime import date, timedelta
 import sys
 import time
 import os
@@ -840,37 +840,72 @@ def get_vaccination_data(read_data=dd.defaultDict['read_data'],
     print("Time needed for age extrapolation: " + str(int(end_time - start_time)) + " sec")
     print("Error check time " + str(err_chk_time))
 
+    # df_data_ageinf_county_cs = pd.read_json(directory + filename + '.json')
+
+    # # correction of vacc for 80+
+    # counties_s = geoger.get_stateid_to_countyids_map()[14]
+    # rows_s = df_data_ageinf_county_cs.ID_County.isin(counties_s)
+    # rows_s_pop = population_new_ages.ID_County.isin(counties_s)
+    # population_new_ages_s = population_new_ages.loc[rows_s_pop,:]
+    # df_s = df_data_ageinf_county_cs[rows_s].copy()
+    # # aggregate total number of vaccinations per county and age group
+    # vacc_sums = df_s.loc[df_s.Date==str(date.today()-timedelta(days=1)) , column_names_new[1]]
+    # # create new data frame and reshape it
+    # df_fullsum = pd.DataFrame(columns=[dd.EngEng['idCounty']] + unique_age_groups_new)
+    # df_fullsum[dd.EngEng['idCounty']] = counties_s
+    # df_fullsum[unique_age_groups_new] = np.array(
+    #     vacc_sums.values).reshape(
+    #     len(counties_s),
+    #     len(unique_age_groups_new))
+    # # compute county and age-group-specific vaccination ratios
+    # df_fullsum[['r'+age for age in unique_age_groups_new]
+    #             ] = df_fullsum[unique_age_groups_new] / population_new_ages_s[unique_age_groups_new].values
+    # # compute percentage and number of added vaccinated in 80+
+    # add_percentage = df_fullsum['r80-99'] + 0.05
+    # add_percentage.loc[np.where(add_percentage>0.95)]=0.95
+    # add_percentage = add_percentage - df_fullsum['r80-99']
+    # add_percentage.loc[np.where(add_percentage<0)]=0
+    # new_vacc_80p = population_new_ages_s['80-99'].values*add_percentage
+    # # take relation to 60-79 approximated before
+    # vacc80_share60 = new_vacc_80p / df_fullsum['60-79']
+    # # shift vaccinations
+    # for mm in range(len(counties_s)):
+    #     df_s.loc[(df_s.ID_County==counties_s[mm]) & (df_s.Age_RKI=='80-99'), column_names_new] += vacc80_share60[mm] * df_s.loc[(df_s.ID_County==counties_s[mm]) & (df_s.Age_RKI=='60-79'), column_names_new]
+    #     df_s.loc[(df_s.ID_County==counties_s[mm]) & (df_s.Age_RKI=='60-79'), column_names_new] -= vacc80_share60[mm] * df_s.loc[(df_s.ID_County==counties_s[mm]) & (df_s.Age_RKI=='60-79'), column_names_new]
+    # gd.write_dataframe(df_s, directory, 'sn_' + filename, file_format)
+
     # correction of vacc for 80+
-    counties_s = geoger.get_stateid_to_countyids_map()[14]
-    rows_s = df_data_ageinf_county_cs.ID_County.isin(counties_s)
-    population_new_ages_s = population_new_ages.loc[rows_s_pop,:]
-    df_s = df_data_ageinf_county_cs[rows_s].copy()
+    counties_n = geoger.get_stateid_to_countyids_map()[3]
+    rows_n = df_data_ageinf_county_cs.ID_County.isin(counties_n)
+    rows_n_pop = population_new_ages.ID_County.isin(counties_n)
+    population_new_ages_n = population_new_ages.loc[rows_n_pop,:]
+    df_n = df_data_ageinf_county_cs[rows_n].copy()
+    gd.write_dataframe(df_n, directory, 'ni_' + filename, file_format)
     # aggregate total number of vaccinations per county and age group
-    vacc_sums = df_s.loc[df_s.Date=='2021-12-01', column_names_new[1]]
+    vacc_sums = df_n.loc[df_n.Date==str(date.today()-timedelta(days=1)) , column_names_new[1]]
     # create new data frame and reshape it
     df_fullsum = pd.DataFrame(columns=[dd.EngEng['idCounty']] + unique_age_groups_new)
-    df_fullsum[dd.EngEng['idCounty']] = counties_s
+    df_fullsum[dd.EngEng['idCounty']] = counties_n
     df_fullsum[unique_age_groups_new] = np.array(
         vacc_sums.values).reshape(
-        len(counties_s),
+        len(counties_n),
         len(unique_age_groups_new))
     # compute county and age-group-specific vaccination ratios
-    rows_s_pop = population_new_ages.ID_County.isin(counties_s)
     df_fullsum[['r'+age for age in unique_age_groups_new]
-                ] = df_fullsum[unique_age_groups_new] / population_new_ages_s[unique_age_groups_new].values
+                ] = df_fullsum[unique_age_groups_new] / population_new_ages_n[unique_age_groups_new].values
     # compute percentage and number of added vaccinated in 80+
     add_percentage = df_fullsum['r80-99'] + 0.05
     add_percentage.loc[np.where(add_percentage>0.95)]=0.95
     add_percentage = add_percentage - df_fullsum['r80-99']
     add_percentage.loc[np.where(add_percentage<0)]=0
-    new_vacc_80p = population_new_ages_s['80-99'].values*add_percentage
+    new_vacc_80p = population_new_ages_n['80-99'].values*add_percentage
     # take relation to 60-79 approximated before
     vacc80_share60 = new_vacc_80p / df_fullsum['60-79']
     # shift vaccinations
-    for mm in range(len(counties_s)):
-        df_s.loc[(df_s.ID_County==counties_s[mm]) & (df_s.Age_RKI=='80-99'), column_names_new] += vacc80_share60[mm] * df_s.loc[(df_s.ID_County==counties_s[mm]) & (df_s.Age_RKI=='60-79'), column_names_new]
-        df_s.loc[(df_s.ID_County==counties_s[mm]) & (df_s.Age_RKI=='60-79'), column_names_new] -= vacc80_share60[mm] * df_s.loc[(df_s.ID_County==counties_s[mm]) & (df_s.Age_RKI=='60-79'), column_names_new]
-    gd.write_dataframe(df_s, directory, 'sn_' + filename, file_format)
+    for mm in range(len(counties_n)):
+        df_n.loc[(df_n.ID_County==counties_n[mm]) & (df_n.Age_RKI=='80-99'), column_names_new] += vacc80_share60[mm] * df_n.loc[(df_n.ID_County==counties_n[mm]) & (df_n.Age_RKI=='60-79'), column_names_new]
+        df_n.loc[(df_n.ID_County==counties_n[mm]) & (df_n.Age_RKI=='60-79'), column_names_new] -= vacc80_share60[mm] * df_n.loc[(df_n.ID_County==counties_n[mm]) & (df_n.Age_RKI=='60-79'), column_names_new]
+    gd.write_dataframe(df_n, directory, 'ni95_' + filename, file_format)
     #
 
     # make plot of relative numbers of original and extrapolated age resolution
