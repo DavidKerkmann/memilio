@@ -65,7 +65,7 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
     
     (countykey2govkey, countykey2localnumlist, gov_county_table,
          state_gov_table) = gcm.assign_geographical_entities(countykey_list, govkey_list)
-    df_commuter_migration = gcm.get_commuter_data()
+    df_commuter_migration = gcm.get_commuter_data(out_folder=path)
     mat_commuter_migration = df_commuter_migration.iloc[: , 0:]
     mat_commuter_migration = mat_commuter_migration.iloc[0: , :]
     
@@ -370,7 +370,7 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
         #direction = both
         (countykey_list, commuter_all) = gcm.get_neighbors_mobility(
             tci, direction='both', abs_tol=0, rel_tol=0,
-            tol_comb='or', merge_eisenach=True, directory='')
+            tol_comb='or', merge_eisenach=True, out_folder='')
         expected_call = "Commuter data was not found. Download and process it from the internet."
         mock_gcd.assert_called_with(expected_call)
         self.assertEqual(len(countykey_list), 398)
@@ -382,7 +382,7 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
         # direction = in
         (countykey_list, commuter_all) = gcm.get_neighbors_mobility(
             tci, direction='in', abs_tol=0, rel_tol=0,
-            tol_comb='or', merge_eisenach=True, directory='')
+            tol_comb='or', merge_eisenach=True, out_folder='')
         self.assertEqual(len(countykey_list), 393)
         self.assertAlmostEqual(48, commuter_all[0], 2)
         self.assertAlmostEqual(842, commuter_all[9], 2)
@@ -391,7 +391,7 @@ class TestCommuterMigration(fake_filesystem_unittest.TestCase):
         # direction = out
         (countykey_list, commuter_all) = gcm.get_neighbors_mobility(
             tci, direction='out', abs_tol=0, rel_tol=0,
-            tol_comb='or', merge_eisenach=True, directory='')
+            tol_comb='or', merge_eisenach=True, out_folder='')
         self.assertEqual(len(countykey_list), 375)
         self.assertAlmostEqual(180, commuter_all[0], 2)
         self.assertAlmostEqual(1304, commuter_all[9], 2)

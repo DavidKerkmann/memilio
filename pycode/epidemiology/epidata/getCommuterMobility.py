@@ -174,10 +174,12 @@ def get_commuter_data(setup_dict='',
     try:
         population = pd.read_json(directory + "county_current_population.json")
         if len(population) != len(countykey_list):
-            population = getPopulationData.get_age_population_data(merge_eisenach=False, write_df=True)
+            population = getPopulationData.get_age_population_data(
+                out_folder=out_folder, merge_eisenach=False, write_df=True)
     except:
         print("Population data was not found. Download it from the internet.")
-        population = getPopulationData.get_age_population_data(merge_eisenach=False, write_df=True)
+        population = getPopulationData.get_age_population_data(
+            out_folder=out_folder, merge_eisenach=False, write_df=True)
     
     countypop_list = list(population["Total"])
 
@@ -424,18 +426,30 @@ def get_commuter_data(setup_dict='',
     filename = 'migration_bfa_20' + files[0].split(
         '-20')[1][0:2] + '_dim' + str(mat_commuter_migration.shape[0])
     gd.write_dataframe(df_commuter_migration, directory, filename, file_format)
-    
+    gd.check_dir(os.path.join(directory, 'mobility'))
     df_commuter_migration.to_csv(
         directory.split('pydata') [0] +'mobility/commuter_migration_scaled' +
         '_20' +files[0].split('-20') [1] [0: 2] +'.txt', sep=' ', index=False,
         header=False)
+    commuter_sanity_checks(df_commuter_migration)
 
     return df_commuter_migration
+
+def commuter_sanity_checks(df):
+    if not isinstance(df, pd.DataFrame):
+        exit_string = ("Error. Data should be a dataframe")
+        sys.exit(exit_string)
+    if len(df.index) != len(df.columns):
+        exit_string = "Error. "
+        sys.exit(exit_string)
+    if (len(df.index) < 40) or (len(df.index) > 500):
+        exit_string = "Error. Size of dataframe unexpected."
+        sys.exit(exit_string)
 
 
 def get_neighbors_mobility(
         countyid, direction='both', abs_tol=0, rel_tol=0, tol_comb='or',
-        merge_eisenach=True, directory='data/pydata/Germany'):
+        merge_eisenach=True, out_folder=dd.defaultDict['out_folder']):
     '''! Returns the neighbors of a particular county ID depening on the
     commuter mobility and given absolute and relative thresholds on the number
     of commuters.
@@ -459,14 +473,16 @@ def get_neighbors_mobility(
         commuters from and to the neighbors.
     '''
     # This is not very nice either to have the same file with either Eisenach merged or not...
+    directory = os.path.join(out_folder, 'Germany/')
+    gd.check_dir(directory)
     try:
         if merge_eisenach:
-            commuter = pd.read_json(directory + "/migration_bfa_2020_dim400.json")
+            commuter = pd.read_json(os.path.join(directory, "migration_bfa_2020_dim400.json"))
         else:
-            commuter = pd.read_json(directory + "/migration_bfa_2020_dim401.json")
+            commuter = pd.read_json(os.path.join(directory, "migration_bfa_2020_dim401.json"))
     except:
         print("Commuter data was not found. Download and process it from the internet.")
-        commuter = get_commuter_data()
+        commuter = get_commuter_data(out_folder=out_folder)
 
 
     countykey_list = commuter.columns
@@ -488,7 +504,7 @@ def get_neighbors_mobility(
 
 def get_neighbors_mobility_all(
         direction='both', abs_tol=0, rel_tol=0, tol_comb='or',
-        merge_eisenach=True, directory='data/pydata/Germany'):
+        merge_eisenach=True, out_folder= dd.defaultDict['out_folder']):
     '''! Returns the neighbors of all counties ID depening on the
     commuter mobility and given absolute and relative thresholds on the number
     of commuters.
@@ -508,6 +524,8 @@ def get_neighbors_mobility_all(
         both ('and')
     @return Neighbors of all counties with respect to mobility.
     '''
+    directory = os.path.join(out_folder, 'Germany/')
+    gd.check_dir(directory)
     countyids = geoger.get_county_ids(merge_eisenach=merge_eisenach)
     neighbors_table = []
     for id in countyids:
@@ -516,7 +534,7 @@ def get_neighbors_mobility_all(
                                    id, direction=direction, abs_tol=abs_tol,
                                    rel_tol=rel_tol, tol_comb=tol_comb,
                                    merge_eisenach=merge_eisenach,
-                                   directory=directory))
+                                   out_folder = out_folder))
 
     return dict(zip(countyids, neighbors_table))
 
@@ -536,7 +554,7 @@ def main():
                   'rel_tol': rel_tol,
                   'path': path}
 
-    get_neighbors_mobility(1001, abs_tol=0, rel_tol=0, tol_comb='or', merge_eisenach=True, directory='data/pydata/Germany')
+    get_neighbors_mobility(1001, abs_tol=0, rel_tol=0, tol_comb='or', merge_eisenach=True, out_folder=dd.defaultDict['out_folder'])
 
     mat_commuter_migration = get_commuter_data(setup_dict, **arg_dict)
 

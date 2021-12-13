@@ -316,9 +316,10 @@ class Test_getPopulationData(fake_filesystem_unittest.TestCase):
         pd.testing.assert_frame_equal(reg_key_read, reg_key_write, check_dtype=False)
         pd.testing.assert_frame_equal(zensus_read, zensus_write, check_dtype=False)
 
+    @patch('epidemiology.epidata.getPopulationData.gd.loadCsv')
     @patch('epidemiology.epidata.getPopulationData.pandas.read_json')
     @patch('epidemiology.epidata.getPopulationData.gd.loadExcel')
-    def test_errors(self, mocklexcel, mockrjson):
+    def test_errors(self, mocklexcel, mockrjson, mocklcsv):
         mockrjson.side_effect = ValueError
         [read_data, file_format, out_folder, no_raw] = [True, "json", self.path, True]
 
@@ -336,6 +337,15 @@ class Test_getPopulationData(fake_filesystem_unittest.TestCase):
             gpd.load_age_population_data(self.path)
         exit_string = "Error: The counties file does not exist."
         self.assertEqual(cm.exception.code, exit_string)
+
+        mocklexcel.side_effect = None
+        mocklexcel.return_value = self.test_zensus.copy()
+        mocklcsv.side_effect = ValueError
+        with self.assertRaises(SystemExit) as cm:
+            gpd.load_age_population_data(self.path)
+        exit_string = "Error: The zensus file does not exist."
+        self.assertEqual(cm.exception.code, exit_string)
+
 
 if __name__ == '__main__':
     unittest.main()

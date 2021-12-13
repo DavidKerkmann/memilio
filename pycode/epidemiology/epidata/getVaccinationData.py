@@ -244,8 +244,12 @@ def get_vaccination_data(read_data=dd.defaultDict['read_data'],
             directory + "county_current_population_dim401.json")
     except:
         print("Population data was not found. Download it from the internet.")
-        population = getPopulationData.get_age_population_data(
-            merge_eisenach=False)
+        population = getPopulationData.get_age_population_data(read_data=False,
+                            file_format = file_format,
+                            out_folder = out_folder,
+                            no_raw=dd.defaultDict['no_raw'],
+                            write_df=True,
+                            merge_eisenach=False)
 
     min_age_pop = []
     extrapolate_agegroups = True
@@ -503,7 +507,7 @@ def get_vaccination_data(read_data=dd.defaultDict['read_data'],
         # vaccinations from vaccination county to extrapolated home counties 
         neighbors_mobility = gcm.get_neighbors_mobility_all(
             direction='in', abs_tol=10, merge_eisenach=False, 
-            directory=directory)
+            out_folder = out_folder)
 
         end_time = time.perf_counter()
         print("Time needed for preparing sanitizing: " +
