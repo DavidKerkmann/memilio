@@ -327,7 +327,7 @@ class Test_getPopulationData(fake_filesystem_unittest.TestCase):
         gd.check_dir(directory)
         with self.assertRaises(SystemExit) as cm:
             gpd.get_one_data_set(read_data, file_format, no_raw, directory, self.d1)
-        file_in = os.path.join(self.path, "Germany\FullDataB.json")
+        file_in = os.path.join(self.path, "Germany/FullDataB.json")
         exit_string = "Error: The file: " + file_in + " does not exist. "\
             "Call program without -r flag to get it."
         self.assertEqual(cm.exception.code, exit_string)

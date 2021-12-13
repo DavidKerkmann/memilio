@@ -61,20 +61,20 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
     def setUp(self):
         self.setUpPyfakefs()
 
-    def gdd_calls(self, text=''):
-        gdd_calls = [
-            call('Information: Data has been written to',
-                 '\\home\\DiviData\\Germany\\FullData_DIVI.json'),
-            call(
-                'Information: Data has been written to',
-                '\\home\\DiviData\\Germany\\county_divi' + text + '.json'),
-            call(
-                'Information: Data has been written to',
-                '\\home\\DiviData\\Germany\\state_divi' + text + '.json'),
-            call(
-                'Information: Data has been written to',
-                '\\home\\DiviData\\Germany\\germany_divi' + text + '.json')]
-        return gdd_calls
+    def gdd_calls(self,text=''):
+        directory = os.path.join(self.path, 'Germany/')
+        gdd_calls= [
+        call('Information: Data has been written to',
+            os.path.join(directory, 'FullData_DIVI.json')),
+        call('Information: Data has been written to',
+            os.path.join(directory, 'county_divi'+text+'.json')),
+        call(
+            'Information: Data has been written to',
+            os.path.join(directory, 'state_divi'+text+'.json')),
+        call(
+            'Information: Data has been written to',
+            os.path.join(directory, 'germany_divi'+text+'.json'))]
+        return gdd_calls 
 
     def test_cut_of_dates(self):
         # test if only dates from 08-09-2021 are returned
@@ -91,7 +91,7 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
         mockrjson.side_effect = ValueError
         with self.assertRaises(SystemExit) as cm:
             gdd.get_divi_data(read_data=True, out_folder=self.path)
-        file_in = os.path.join(self.path, "Germany\FullData_DIVI.json")
+        file_in = os.path.join(self.path, "Germany/FullData_DIVI.json")
         exit_string = "Error: The file: " + file_in + " does not exist. "\
             "Call program without -r flag to get it."
         self.assertEqual(cm.exception.code, exit_string)
@@ -197,7 +197,7 @@ class TestGetDiviData(fake_filesystem_unittest.TestCase):
 
         # test if it works in main
         with self.assertRaises(SystemExit) as cm:
-            gdd.get_divi_data(read_data=True)
+            gdd.get_divi_data(read_data=True, out_folder=self.path)
         exit_string = "Error: Number of data categories changed."
         self.assertEqual(cm.exception.code, exit_string)
 
